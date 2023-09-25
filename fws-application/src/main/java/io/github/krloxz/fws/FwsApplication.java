@@ -21,14 +21,12 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
-import org.jooq.tools.r2dbc.LoggingConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.r2dbc.connection.DelegatingConnectionFactory;
 import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
@@ -41,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.krloxz.fws.infra.jooq.tables.records.AddressesRecord;
 import io.github.krloxz.fws.infra.jooq.tables.records.CommunicationChannelsRecord;
 import io.github.krloxz.fws.infra.jooq.tables.records.FreelancersRecord;
-import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,26 +52,7 @@ public class FwsApplication {
 
   @Bean
   DSLContext dslContext(final ConnectionFactory factory) {
-    return DSL.using(
-        new LoggingConnectionFactoryProxy(new TransactionAwareConnectionFactoryProxy(factory)),
-        SQLDialect.H2);
-  }
-
-}
-
-
-class LoggingConnectionFactoryProxy extends DelegatingConnectionFactory {
-
-  /**
-   * @param targetConnectionFactory
-   */
-  public LoggingConnectionFactoryProxy(final ConnectionFactory targetConnectionFactory) {
-    super(targetConnectionFactory);
-  }
-
-  @Override
-  public Mono<? extends Connection> create() {
-    return super.create().map(LoggingConnection::new);
+    return DSL.using(new TransactionAwareConnectionFactoryProxy(factory), SQLDialect.H2);
   }
 
 }
