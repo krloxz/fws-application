@@ -19,13 +19,17 @@ import org.immutables.value.Value;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Result;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.jooq.tools.r2dbc.LoggingConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.r2dbc.connection.DelegatingConnectionFactory;
+import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,6 +41,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.krloxz.fws.infra.jooq.tables.records.AddressesRecord;
 import io.github.krloxz.fws.infra.jooq.tables.records.CommunicationChannelsRecord;
 import io.github.krloxz.fws.infra.jooq.tables.records.FreelancersRecord;
+import io.r2dbc.spi.Connection;
+import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,6 +51,30 @@ public class FwsApplication {
 
   public static void main(final String[] args) {
     SpringApplication.run(FwsApplication.class, args);
+  }
+
+  @Bean
+  DSLContext dslContext(final ConnectionFactory factory) {
+    return DSL.using(
+        new LoggingConnectionFactoryProxy(new TransactionAwareConnectionFactoryProxy(factory)),
+        SQLDialect.H2);
+  }
+
+}
+
+
+class LoggingConnectionFactoryProxy extends DelegatingConnectionFactory {
+
+  /**
+   * @param targetConnectionFactory
+   */
+  public LoggingConnectionFactoryProxy(final ConnectionFactory targetConnectionFactory) {
+    super(targetConnectionFactory);
+  }
+
+  @Override
+  public Mono<? extends Connection> create() {
+    return super.create().map(LoggingConnection::new);
   }
 
 }
@@ -91,14 +121,14 @@ class SampleDataInitializer {
 
   @EventListener(ApplicationReadyEvent.class)
   @Transactional
-  void initialize() {
-    this.repository.deleteAll()
+  Flux<Freelancer> initialize() {
+    return this.repository.deleteAll()
         .thenMany(
             Flux.just("Josh", "Cornelia", "Dr. Syer", "Violetta", "Stephane", "Olga", "Sebastian", "Madhura")
                 .map(this::freelancer))
         .flatMap(this.repository::save)
         .thenMany(this.repository.findAll())
-        .subscribe(LOGGER::info);
+        .doOnNext(LOGGER::info);
   }
 
   Freelancer freelancer(final String name) {
@@ -131,31 +161,21 @@ class FreelancerRepository {
   private DSLContext create;
 
   public Mono<Void> deleteAll() {
-    return Mono.fromRunnable(
-        () -> this.create.delete(FREELANCERS).execute());
+    return Mono.from(this.create.delete(FREELANCERS)).then();
   }
 
   public Mono<Freelancer> save(final Freelancer freelancer) {
-    return Mono.just(freelancer)
-        .map(freelancerToSave -> {
-
-          this.create.insertInto(FREELANCERS)
-              .set(toFreelancersRecord(freelancer))
-              .execute();
-
-          this.create.insertInto(ADDRESSES)
-              .set(toAddressesRecord(freelancer))
-              .execute();
-
-          this.create.batch(
-              toCommunicationChannelsRecords(freelancer)
-                  .map(
-                      channelsRecord -> this.create.insertInto(COMMUNICATION_CHANNELS).set(channelsRecord))
-                  .toList())
-              .execute();
-
-          return freelancerToSave;
-        });
+    return Flux.from(
+        this.create.insertInto(FREELANCERS).set(toFreelancersRecord(freelancer)))
+        .thenMany(
+            this.create.insertInto(ADDRESSES).set(toAddressesRecord(freelancer)))
+        .thenMany(
+            this.create.batch(
+                toCommunicationChannelsRecords(freelancer)
+                    .map(
+                        channelsRecord -> this.create.insertInto(COMMUNICATION_CHANNELS).set(channelsRecord))
+                    .toList()))
+        .then(Mono.just(freelancer));
   }
 
   private FreelancersRecord toFreelancersRecord(final Freelancer freelancer) {
@@ -193,25 +213,27 @@ class FreelancerRepository {
   }
 
   public Flux<Freelancer> findAll() {
-    return Flux.fromStream(
+    return Flux.from(
         this.create.select(FREELANCERS.ID)
+            .from(FREELANCERS))
+        .log()
+        .<UUID>map(Record1::value1)
+        .flatMap(this::findFreelancer)
+        .map(this::toFreelancer);
+  }
+
+  private Mono<List<Record>> findFreelancer(final UUID id) {
+    return Flux.from(
+        this.create.select(DSL.asterisk())
             .from(FREELANCERS)
-            .stream()
-            .map(Record1::value1)
-            .map(this::findFreelancer)
-            .map(this::toFreelancer));
+            .join(ADDRESSES).onKey()
+            .leftJoin(COMMUNICATION_CHANNELS).onKey()
+            .where(FREELANCERS.ID.eq(id)))
+        .log()
+        .collectList();
   }
 
-  private Result<Record> findFreelancer(final UUID id) {
-    return this.create.select(DSL.asterisk())
-        .from(FREELANCERS)
-        .join(ADDRESSES).onKey()
-        .leftJoin(COMMUNICATION_CHANNELS).onKey()
-        .where(FREELANCERS.ID.eq(id))
-        .fetch();
-  }
-
-  private Freelancer toFreelancer(final Result<Record> result) {
+  private Freelancer toFreelancer(final List<Record> result) {
     final var record = result.get(0).into(FREELANCERS);
     return Freelancer.builder()
         .id(FreelancerId.of(record.getId()))
@@ -226,7 +248,7 @@ class FreelancerRepository {
         .build();
   }
 
-  private Address toAddress(final Result<Record> result) {
+  private Address toAddress(final List<Record> result) {
     final var record = result.get(0).into(ADDRESSES);
     return Address.builder()
         .street(record.getStreet())
@@ -238,9 +260,9 @@ class FreelancerRepository {
         .build();
   }
 
-  private List<CommunicationChannel> toCommunicationChannels(final Result<Record> result) {
-    return result.into(COMMUNICATION_CHANNELS)
-        .stream()
+  private List<CommunicationChannel> toCommunicationChannels(final List<Record> result) {
+    return result.stream()
+        .map(record -> record.into(COMMUNICATION_CHANNELS))
         .map(record -> CommunicationChannel.of(record.getValue1(), CommunicationChannelType.valueOf(record.getType())))
         .toList();
   }
