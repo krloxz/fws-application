@@ -27,10 +27,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -131,17 +133,145 @@ class SampleDataInitializer {
 }
 
 
+interface FreelancerRepository {
+
+  Mono<Void> deleteAll();
+
+  Mono<Freelancer> save(Freelancer freelancer);
+
+  Flux<Freelancer> findAll();
+
+}
+
+
 @Repository
-@Transactional(propagation = Propagation.MANDATORY)
-class FreelancerRepository {
+class ReactiveFreelancerRepository implements FreelancerRepository {
+
+  @Autowired
+  private FreelancersDao freelancersDao;
+
+  @Autowired
+  private AddressesDao addressesDao;
+
+  @Autowired
+  private CommunicationChannelsDao channelsDao;
+
+  @Override
+  public Mono<Void> deleteAll() {
+    return this.freelancersDao.deleteAll();
+  }
+
+  @Override
+  public Mono<Freelancer> save(final Freelancer freelancer) {
+    return this.freelancersDao.save(toFreelancersRecord(freelancer))
+        .then(this.addressesDao.save(toAddressesRecord(freelancer)))
+        .thenMany(this.channelsDao.saveAll(toCommunicationChannelsRecords(freelancer)))
+        .then(Mono.just(freelancer));
+  }
+
+  private Freelancers toFreelancersRecord(final Freelancer freelancer) {
+    return new Freelancers(
+        freelancer.id().value(),
+        freelancer.name().first(),
+        freelancer.name().last(),
+        freelancer.name().middle().orElse(null),
+        freelancer.gender().map(Gender::name).orElse(null),
+        freelancer.wage().value(),
+        freelancer.wage().currency().getCurrencyCode(),
+        freelancer.nicknames().stream().collect(joining(",")),
+        null);
+  }
+
+  private Addresses toAddressesRecord(final Freelancer freelancer) {
+    return new Addresses(
+        freelancer.id().value(),
+        freelancer.address().street(),
+        freelancer.address().apartment().orElse(null),
+        freelancer.address().city(),
+        freelancer.address().state(),
+        freelancer.address().country(),
+        freelancer.address().zipCode(),
+        null);
+  }
+
+  private Flux<CommunicationChannels> toCommunicationChannelsRecords(final Freelancer freelancer) {
+    return Flux.fromIterable(freelancer.communicationChannels())
+        .map(
+            channel -> new CommunicationChannels(
+                null,
+                freelancer.id().value(),
+                channel.value(),
+                channel.type().name(),
+                null));
+  }
+
+  @Override
+  public Flux<Freelancer> findAll() {
+    return Flux.empty();
+  }
+
+}
+
+
+interface FreelancersDao extends ReactiveCrudRepository<Freelancers, UUID> {
+}
+
+
+interface AddressesDao extends ReactiveCrudRepository<Addresses, UUID> {
+}
+
+
+interface CommunicationChannelsDao extends ReactiveCrudRepository<CommunicationChannels, Long> {
+}
+
+
+record Freelancers(
+    @Id UUID id,
+    String firstName,
+    String lastName,
+    String middleName,
+    String gender,
+    BigDecimal hourlyWageValue,
+    String hourlyWageCurrency,
+    String nicknames,
+    @Version Long version) {
+}
+
+
+record Addresses(
+    @Id UUID freelancerId,
+    String street,
+    String apartment,
+    String city,
+    String state,
+    String country,
+    String zip_code,
+    @Version Long version) {
+}
+
+
+record CommunicationChannels(
+    @Id Long id,
+    UUID freelancerId,
+    String value1,
+    String type,
+    @Version Long version) {
+}
+
+
+// @Repository
+// @Transactional(propagation = Propagation.MANDATORY)
+class JooqFreelancerRepository implements FreelancerRepository {
 
   @Autowired
   private DSLContext create;
 
+  @Override
   public Mono<Void> deleteAll() {
     return Mono.from(this.create.delete(FREELANCERS)).then();
   }
 
+  @Override
   public Mono<Freelancer> save(final Freelancer freelancer) {
     return Flux.from(
         this.create.insertInto(FREELANCERS).set(toFreelancersRecord(freelancer)))
@@ -190,6 +320,7 @@ class FreelancerRepository {
                 .setType(channel.type().name()));
   }
 
+  @Override
   public Flux<Freelancer> findAll() {
     return Flux.from(
         this.create.select(FREELANCERS.ID)

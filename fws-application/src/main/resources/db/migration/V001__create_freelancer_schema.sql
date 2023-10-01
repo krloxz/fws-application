@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS freelancer.freelancers(
   gender TEXT,
   hourly_wage_value NUMERIC(5,2) NOT NULL,
   hourly_wage_currency TEXT NOT NULL,
-  nicknames TEXT NOT NULL
+  nicknames TEXT NOT NULL,
+  version BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS freelancer.addresses(
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS freelancer.addresses(
   state TEXT NOT NULL,
   country TEXT NOT NULL,
   zip_code TEXT NOT NULL,
+  version BIGINT NOT NULL,
   
   CONSTRAINT address_freelancer_fk
     FOREIGN KEY (freelancer_id)
@@ -27,9 +29,11 @@ CREATE TABLE IF NOT EXISTS freelancer.addresses(
 );
 
 CREATE TABLE IF NOT EXISTS freelancer.communication_channels(
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
   freelancer_id UUID NOT NULL,
   value1 TEXT NOT NULL,
   type TEXT NOT NULL,
+  version BIGINT NOT NULL,
   
   CONSTRAINT communication_channel_freelancer_fk
     FOREIGN KEY (freelancer_id)
