@@ -3,8 +3,8 @@ package io.github.krloxz.fws.test;
 import org.springframework.stereotype.Component;
 
 /**
- * The FwsApplication encapsulated to test its functionalities using a DSL that's similar to the
- * Gherkin language:
+ * The FwsApplication encapsulated to test its functionalities using a DSL that attempts to resemble
+ * the Gherkin language:
  *
  * <pre>
  * this.fwsApplication.running()

@@ -1,6 +1,5 @@
 package io.github.krloxz.fws.test;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.ListAssert;
@@ -8,11 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 
 import io.github.krloxz.fws.freelancer.application.FreelancerDto;
-import net.javacrumbs.jsonunit.assertj.JsonAssert;
-import net.javacrumbs.jsonunit.assertj.JsonAssertion;
 
 /**
  * Entry point to the assertions for the FwsApplication.
@@ -55,35 +51,6 @@ public class FwsApplicationAssertions {
         .block();
 
     return assertThat(freelancers);
-  }
-
-  /**
-   * @return
-   */
-  public BodyContentSpec freelancersBody() {
-    return this.webClient.get()
-        .uri("/freelancers")
-        .accept(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody();
-  }
-
-  /**
-   * @return
-   */
-  public JsonAssert freelancersJson(final JsonAssertion... assertions) {
-    final var freelancers = this.webClient.get()
-        .uri("/freelancers")
-        .accept(MediaType.APPLICATION_JSON)
-        .exchange()
-        .expectStatus().isOk()
-        .returnResult(FreelancerDto.class)
-        .getResponseBody()
-        .collectList()
-        .block();
-
-    return assertThatJson(freelancers).and(assertions);
   }
 
 }
