@@ -1,11 +1,13 @@
 package io.github.krloxz.fws;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import io.github.krloxz.fws.freelancer.application.FreelancerDto;
+import io.github.krloxz.fws.test.DatabaseCleaner;
 import io.github.krloxz.fws.test.TestFwsApplication;
 
 /**
@@ -15,6 +17,7 @@ import io.github.krloxz.fws.test.TestFwsApplication;
  */
 @SpringBootTest
 @AutoConfigureWebTestClient
+@ExtendWith(DatabaseCleaner.class)
 public class FreelancerApiTest {
 
   @Autowired
