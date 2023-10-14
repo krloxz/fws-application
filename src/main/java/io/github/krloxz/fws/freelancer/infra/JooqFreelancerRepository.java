@@ -65,7 +65,6 @@ class JooqFreelancerRepository implements FreelancerRepository {
   public Flux<Freelancer> findAll() {
     return Flux.from(
         this.create.select(FREELANCERS.ID).from(FREELANCERS).orderBy(FREELANCERS.FIRST_NAME))
-        .log()
         .<UUID>map(Record1::value1)
         .flatMap(this::findFreelancer)
         .map(this::toFreelancer);
@@ -112,7 +111,6 @@ class JooqFreelancerRepository implements FreelancerRepository {
             .join(ADDRESSES).onKey()
             .leftJoin(COMMUNICATION_CHANNELS).onKey()
             .where(FREELANCERS.ID.eq(id)))
-        .log()
         .collectList();
   }
 

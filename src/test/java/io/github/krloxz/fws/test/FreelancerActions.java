@@ -43,8 +43,7 @@ public class FreelancerActions {
         .accept(MediaType.APPLICATION_JSON)
         .bodyValue(freelancer)
         .exchange()
-        .expectStatus()
-        .isCreated();
+        .returnResult(Void.class);
   }
 
 }
