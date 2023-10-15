@@ -59,7 +59,7 @@ class AfterExchangeFilter implements ExchangeFilterFunction {
             response -> response.mutate().body(
                 data -> data
                     .doOnNext(body -> capturedResponseBody.append(readData(body)))
-                    .doFinally(ignored -> {
+                    .doOnTerminate(() -> {
                       this.afterExchangeAction.accept(
                           new ExchangeResult(
                               request,

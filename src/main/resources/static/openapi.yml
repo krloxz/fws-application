@@ -1,0 +1,51 @@
+openapi: '3.0.2'
+info:
+  title: Freelancer Web Services API
+  version: '0.1'
+paths:
+  /freelancers:
+    get:
+      tags:
+        - Freelancers
+      description: Retrieves all the freelancers registered on the system.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref:  "#/components/schemas/Freelancer"
+    post:
+      tags:
+        - Freelancers
+      description: Registers a new freelancer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Freelancer"
+      responses:
+        '201':
+          description: Freelancer was registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+
+components:
+  schemas:
+    Freelancer:
+      type: object
+      required:
+        - id
+        - firstName
+      properties:
+        id:
+          type: string
+          example: 1
+        firstName:
+          type: string
+          example: Tony

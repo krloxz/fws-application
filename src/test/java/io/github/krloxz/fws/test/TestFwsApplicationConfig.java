@@ -15,7 +15,8 @@ class TestFwsApplicationConfig {
   @Bean
   WebTestClientBuilderCustomizer customizer() {
     return builder -> {
-      builder.filter(new AfterExchangeFilter(new ExchangeLogger()));
+      builder.filter(new AfterExchangeFilter(new ExchangeLogger()))
+          .filter(new AfterExchangeFilter(new OpenApiValidator()));
     };
   }
 
