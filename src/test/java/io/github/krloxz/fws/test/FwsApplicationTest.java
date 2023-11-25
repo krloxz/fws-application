@@ -17,13 +17,13 @@ import org.springframework.context.annotation.Import;
  *
  * @author Carlos Gomez
  */
+@Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Documented
 @SpringBootTest
-@AutoConfigureWebTestClient
 @ExtendWith(DatabaseCleaner.class)
 @Import(TestFwsApplicationConfig.class)
+@AutoConfigureWebTestClient(timeout = "30m")
 public @interface FwsApplicationTest {
 
 }

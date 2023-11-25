@@ -2,7 +2,7 @@ package io.github.krloxz.fws.test;
 
 import java.util.List;
 
-import org.springframework.http.MediaType;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import io.github.krloxz.fws.freelancer.application.FreelancerDto;
@@ -40,7 +40,7 @@ public class FreelancerActions {
   private void register(final FreelancerDto freelancer) {
     this.webClient.post()
         .uri("/freelancers")
-        .accept(MediaType.APPLICATION_JSON)
+        .accept(MediaTypes.HAL_JSON)
         .bodyValue(freelancer)
         .exchange()
         .returnResult(Void.class);

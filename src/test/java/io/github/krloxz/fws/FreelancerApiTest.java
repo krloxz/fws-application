@@ -30,11 +30,11 @@ public class FreelancerApiTest {
   }
 
   private FreelancerDto tonyStark() {
-    return new FreelancerDto("a", "Tony");
+    return new FreelancerDto("Tony", "Stark");
   }
 
   private FreelancerDto steveRogers() {
-    return new FreelancerDto("b", "Steve");
+    return new FreelancerDto("Steve", "Rogers");
   }
 
 }

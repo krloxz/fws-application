@@ -1,5 +1,10 @@
 package io.github.krloxz.fws.test;
 
+import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.allOf;
+import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.anyOf;
+import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.messageContainsRegexp;
+import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.messageHasKey;
+
 import java.util.function.Consumer;
 
 import org.springframework.web.client.RestClientException;
@@ -9,6 +14,7 @@ import com.atlassian.oai.validator.model.SimpleRequest;
 import com.atlassian.oai.validator.model.SimpleResponse;
 import com.atlassian.oai.validator.report.JsonValidationReportFormat;
 import com.atlassian.oai.validator.report.ValidationReport;
+import com.atlassian.oai.validator.whitelist.ValidationErrorsWhitelist;
 
 /**
  * {@link Consumer} that validates an {@link ExchangeResult} against the Open API specification
@@ -33,11 +39,23 @@ public class OpenApiValidator implements Consumer<ExchangeResult> {
         .withBody(result.responseBody());
     result.response().headers().asHttpHeaders().forEach(responseBuilder::withHeader);
 
-    final var validator = OpenApiInteractionValidator.createForSpecificationUrl("/static/openapi.yml").build();
+    final var validator = OpenApiInteractionValidator.createForSpecificationUrl("/static/openapi.yml")
+        .withWhitelist(whitelist())
+        .build();
     final var report = validator.validate(requestBuilder.build(), responseBuilder.build());
     if (report.hasErrors()) {
       throw new OpenApiValidationException(report);
     }
+  }
+
+  private static ValidationErrorsWhitelist whitelist() {
+    return ValidationErrorsWhitelist.create()
+        .withRule("Ignore additional properties when using 'allOf'",
+            allOf(
+                anyOf(
+                    messageHasKey("validation.request.body.schema.allOf"),
+                    messageHasKey("validation.response.body.schema.allOf")),
+                messageContainsRegexp("Instance failed to match all required schemas")));
   }
 
   /**

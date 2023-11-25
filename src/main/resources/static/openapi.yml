@@ -3,6 +3,31 @@ info:
   title: Freelancer Web Services API
   version: '0.1'
 paths:
+  /:
+    get:
+      tags:
+        - Root
+      description: Retrieves the resources that compose the Freelancer Web Services API.
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                required:
+                  - _links
+                properties:
+                  _links:
+                    type: object
+                    required:
+                      - self
+                      - freelancers
+                    properties:
+                      self:
+                        $ref: "#/components/schemas/Link"
+                      freelancers:
+                        $ref: "#/components/schemas/Link"
   /freelancers:
     get:
       tags:
@@ -12,11 +37,24 @@ paths:
         '200':
           description: Success
           content:
-            application/json:
+            application/hal+json:
               schema:
-                type: array
-                items:
-                  $ref:  "#/components/schemas/Freelancer"
+                allOf:
+                  - $ref: "#/components/schemas/Entity"
+                  - type: object
+                    required:
+                      - _embedded
+                    properties:
+                      _embedded:
+                        type: object
+                        required:
+                          - freelancers
+                        properties:
+                          freelancers:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Freelancer"
+
     post:
       tags:
         - Freelancers
@@ -31,21 +69,46 @@ paths:
         '201':
           description: Freelancer was registered
           content:
-            application/json:
+            application/hal+json:
               schema:
                 $ref: "#/components/schemas/Freelancer"
 
 components:
   schemas:
     Freelancer:
+      allOf:
+        - type: object
+          required:
+            - firstName
+            - lastName
+          properties:
+            id:
+              type: string
+              example: 1
+            firstName:
+              type: string
+              example: Tony
+            lastName:
+              type: string
+              example: Stark
+        - $ref: "#/components/schemas/Entity"
+    Entity:
       type: object
       required:
-        - id
-        - firstName
+        - _links
       properties:
-        id:
+        _links:
+          type: object
+          required:
+            - self
+          properties:
+            self:
+              $ref: "#/components/schemas/Link"
+    Link:
+      type: object
+      required:
+        - href
+      properties:
+        href:
           type: string
-          example: 1
-        firstName:
-          type: string
-          example: Tony
+          example: resource/uri

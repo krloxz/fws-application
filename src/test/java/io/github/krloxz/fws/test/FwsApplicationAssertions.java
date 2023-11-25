@@ -2,9 +2,12 @@ package io.github.krloxz.fws.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.assertj.core.api.ListAssert;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.core.TypeReferences.CollectionModelType;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -42,15 +45,15 @@ public class FwsApplicationAssertions {
   public ListAssert<FreelancerDto> freelancers() {
     final var freelancers = this.webClient.get()
         .uri("/freelancers")
-        .accept(MediaType.APPLICATION_JSON)
+        .accept(MediaTypes.HAL_JSON)
         .exchange()
         .expectStatus().isOk()
-        .returnResult(FreelancerDto.class)
+        .returnResult(new CollectionModelType<FreelancerDto>() {})
         .getResponseBody()
-        .collectList()
-        .block();
+        .blockLast()
+        .getContent();
 
-    return assertThat(freelancers);
+    return assertThat(List.copyOf(freelancers));
   }
 
 }
