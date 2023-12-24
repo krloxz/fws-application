@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Validation Error</title>
+  </head>
+  <prebody>
+    <h1>Validation Error</h1>
+    <p>
+      This application reports validation errors using an extension of
+      <a href="https://datatracker.ietf.org/doc/html/rfc7807">Problem Details for HTTP APIs</a>
+      that adds the "errors" property, an array of objects with the following members:
+    </p>
+    <ul>
+      <li>
+        "attribute" (string) - Name of the request body's attribute that caused the problem,
+        if not present the whole body should be considered the cause of the problem.
+      </li>
+      <li>
+        "detail" (string) - A human-readable description of the error.
+      </li>
+    </ul>
+    <h3>Example:</h3>
+    <pre
+      <code>
+{
+  "type" : "/probs/validation-error.html",
+  "title" : "Bad Request",
+  "status" : 400,
+  "detail" : "Invalid request content.",
+  "instance" : "/freelancers",
+  "errors" : [ {
+    "attribute" : "lastName",
+    "detail" : "must not be blank"
+  }, {
+    "attribute" : "firstName",
+    "detail" : "must not be blank"
+  } ]
+}
+      </code>
+    </pre>
+    <p>
+      Find additional details in the <a href="../openapi.yml">Open API specification</a>.
+    </p>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 package io.github.krloxz.fws.test;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,19 +13,20 @@ import org.springframework.stereotype.Component;
  * @author Carlos Gomez
  */
 @Component
-public class FwsApplicationInitializers {
+public class FwsApplicationInitializers implements ApplicationContextAware {
 
-  private final FwsApplicationActions actions;
+  private ApplicationContext context;
 
-  public FwsApplicationInitializers(final FwsApplicationActions actions) {
-    this.actions = actions;
+  @Override
+  public void setApplicationContext(final ApplicationContext context) {
+    this.context = context;
   }
 
   /**
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions when() {
-    return this.actions;
+    return new FwsApplicationActions(this.context);
   }
 
 }

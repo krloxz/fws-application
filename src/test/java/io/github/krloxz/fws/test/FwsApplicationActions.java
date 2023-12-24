@@ -2,8 +2,7 @@ package io.github.krloxz.fws.test;
 
 import java.util.List;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import io.github.krloxz.fws.freelancer.application.FreelancerDto;
@@ -15,24 +14,22 @@ import io.github.krloxz.fws.freelancer.application.FreelancerDto;
  *
  * @author Carlos Gomez
  */
-@Component
 public class FwsApplicationActions {
 
   private final WebTestClient webClient;
-  private final FwsApplicationAssertions assertions;
+  private final RecordedActions recordedActions;
+  private final ApplicationContext context;
 
   /**
-   * Creates a new instance
+   * Creates a new instance.
    *
-   * @param assertions
-   *        the {@link FwsApplicationAssertions}
-   * @param webClient
-   *        {@link WebTestClient} ready to perform HTTP request over the mock server provided by
-   *        {@link SpringBootTest}
+   * @param context
+   *        the current Spring application context, used to manually retrieve required dependencies
    */
-  public FwsApplicationActions(final FwsApplicationAssertions assertions, final WebTestClient webClient) {
-    this.webClient = webClient;
-    this.assertions = assertions;
+  public FwsApplicationActions(final ApplicationContext context) {
+    this.context = context;
+    this.webClient = context.getBean(WebTestClient.class);
+    this.recordedActions = new RecordedActions();
   }
 
   /**
@@ -41,14 +38,29 @@ public class FwsApplicationActions {
    * @return the {@link FreelancerActions}
    */
   public FreelancerActions freelancers(final FreelancerDto... freelancers) {
-    return new FreelancerActions(List.of(freelancers), this.webClient, this);
+    return new FreelancerActions(List.of(freelancers), this);
   }
 
   /**
    * @return the {@link FwsApplicationAssertions}
    */
   public FwsApplicationAssertions then() {
-    return this.assertions;
+    return new FwsApplicationAssertions(this.recordedActions, this.context);
+  }
+
+  /**
+   * @return the action recorder where all the actions required for the current test are being
+   *         recorded
+   */
+  ActionsRecorder actionsRecorder() {
+    return this.recordedActions;
+  }
+
+  /**
+   * @return a web test client ready to use
+   */
+  public WebTestClient webClient() {
+    return this.webClient;
   }
 
 }
