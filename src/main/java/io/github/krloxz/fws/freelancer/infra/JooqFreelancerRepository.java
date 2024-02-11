@@ -70,6 +70,11 @@ class JooqFreelancerRepository implements FreelancerRepository {
         .map(this::toFreelancer);
   }
 
+  @Override
+  public Mono<Freelancer> findById(final FreelancerId id) {
+    return findFreelancer(id.value()).map(this::toFreelancer);
+  }
+
   private FreelancersRecord toFreelancersRecord(final Freelancer freelancer) {
     return new FreelancersRecord()
         .setId(freelancer.id().value())

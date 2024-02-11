@@ -42,6 +42,22 @@ public class FreelancerActions {
     return this.applicationActions;
   }
 
+  /**
+   * Invokes the endpoint that retrieves freelancers by ID.
+   *
+   * @param id
+   *        identifier of the freelancer to retrieve
+   * @return the {@link FwsApplicationActions}
+   */
+  public FwsApplicationActions retrieved(final String id) {
+    this.actionRecorder.add(
+        () -> this.webClient.get()
+            .uri("/freelancers/" + id)
+            .accept(MediaTypes.HAL_JSON)
+            .exchange());
+    return this.applicationActions;
+  }
+
   private Supplier<ResponseSpec> register(final FreelancerDto freelancer) {
     return () -> this.webClient.post()
         .uri("/freelancers")

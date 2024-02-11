@@ -33,13 +33,13 @@ class FreelancerAssembler implements ReactiveRepresentationModelAssembler<Freela
   public Mono<CollectionModel<EntityModel<FreelancerDto>>> toCollectionModel(
       final Flux<? extends FreelancerDto> entities, final ServerWebExchange exchange) {
     final var getAllMethod = WebFluxLinkBuilder.methodOn(FreelancersApiController.class).getAll();
-    return entities.flatMap(entity -> toModel(entity, exchange))
-        .collectList()
+    return WebFluxLinkBuilder.linkTo(getAllMethod, exchange)
+        .withSelfRel()
+        .toMono()
         .flatMap(
-            dtos -> WebFluxLinkBuilder.linkTo(getAllMethod, exchange)
-                .withSelfRel()
-                .toMono()
-                .map(link -> CollectionModel.of(dtos, link)));
+            selfLink -> entities.flatMap(entity -> toModel(entity, exchange))
+                .collectList()
+                .map(dtos -> CollectionModel.of(dtos, selfLink)));
   }
 
 }

@@ -1,5 +1,7 @@
 package io.github.krloxz.fws.freelancer.application;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import io.github.krloxz.fws.freelancer.domain.Address;
 import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
@@ -57,10 +60,10 @@ public class FreelancersApiController {
   @GetMapping("/{id}")
   @Transactional(readOnly = true)
   public Mono<FreelancerDto> getOne(@PathVariable final String id) {
-    return this.repository.findAll()
-        .filter(freelancer -> freelancer.id().value().toString().equals(id))
+    return toFreelancerId(id)
+        .flatMap(this.repository::findById)
         .map(this::toDto)
-        .next();
+        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
   }
 
   /**
@@ -75,6 +78,14 @@ public class FreelancersApiController {
   public Mono<FreelancerDto> register(@Validated @RequestBody final FreelancerDto dto) {
     return this.repository.save(toFreelancer(dto))
         .map(this::toDto);
+  }
+
+  private Mono<FreelancerId> toFreelancerId(final String id) {
+    try {
+      return Mono.just(FreelancerId.of(UUID.fromString(id)));
+    } catch (final IllegalArgumentException e) {
+      return Mono.empty();
+    }
   }
 
   FreelancerDto toDto(final Freelancer freelancer) {

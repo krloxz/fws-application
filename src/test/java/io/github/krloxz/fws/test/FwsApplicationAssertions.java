@@ -1,16 +1,9 @@
 package io.github.krloxz.fws.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.assertj.core.api.ListAssert;
 import org.springframework.context.ApplicationContext;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.server.core.TypeReferences.CollectionModelType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import io.github.krloxz.fws.freelancer.application.FreelancerDto;
+import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 /**
  * Entry point to the assertions for the FwsApplication.
@@ -41,36 +34,28 @@ public class FwsApplicationAssertions {
   }
 
   /**
-   * Asserts that all the recorded actions were successful and returns the assertions that can be used
-   * to validate the freelancers registered in the system.
+   * Asserts that all the recorded actions were successful and returns a {@link ResponseSpec} to
+   * validate the freelancers registered in the system.
    *
-   * @return the assertions that can be used to validate the freelancers registered in the system
+   * @return a {@link ResponseSpec} to validate the freelancers registered in the system
    */
-  public ListAssert<FreelancerDto> freelancers() {
+  public ResponseSpec freelancers() {
     this.recordedActions.succeed();
 
-    final var freelancers = this.webClient.get()
+    return this.webClient.get()
         .uri("/freelancers")
         .accept(MediaTypes.HAL_JSON)
-        .exchange()
-        .expectStatus().isOk()
-        .returnResult(new CollectionModelType<FreelancerDto>() {})
-        .getResponseBody()
-        .blockLast()
-        .getContent();
-
-    return assertThat(List.copyOf(freelancers));
+        .exchange();
   }
 
   /**
-   * Asserts that all the recorded actions, but the last one, were successful and returns the
-   * assertions that can be used to validate the response of the last action that was recorded.
+   * Asserts that all the recorded actions, but the last one, were successful and returns a
+   * {@link ResponseSpec} to validate the response of the last action that was recorded.
    *
-   * @return the assertions that can be used to validate the response of the last action that was
-   *         recorded
+   * @return a {@link ResponseSpec} to validate the response of the last action that was recorded
    */
-  public ResponseAssertions response() {
-    return new ResponseAssertions(this.recordedActions.lastResponse());
+  public ResponseSpec response() {
+    return this.recordedActions.lastResponse();
   }
 
 }

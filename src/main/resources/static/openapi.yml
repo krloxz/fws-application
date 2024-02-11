@@ -30,6 +30,7 @@ paths:
                         $ref: "#/components/schemas/Link"
         default:
           $ref: "#/components/responses/Error"
+
   /freelancers:
     get:
       tags:
@@ -58,7 +59,6 @@ paths:
                               $ref: "#/components/schemas/Freelancer"
         default:
           $ref: "#/components/responses/Error"
-
     post:
       tags:
         - Freelancers
@@ -72,6 +72,28 @@ paths:
       responses:
         "201":
           description: Freelancer was registered
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /freelancers/{id}:
+    get:
+      tags:
+        - Freelancers
+      description: Retrieves a registered freelancer by ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a freelancer already registered.
+      responses:
+        "200":
+          description: Success
           content:
             application/hal+json:
               schema:
@@ -132,7 +154,6 @@ components:
               - type
               - title
               - status
-              - detail
               - instance
             properties:
               type:

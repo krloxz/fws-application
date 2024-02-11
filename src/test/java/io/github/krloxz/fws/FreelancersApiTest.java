@@ -1,8 +1,11 @@
 package io.github.krloxz.fws;
 
+import static org.hamcrest.CoreMatchers.hasItems;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.server.core.TypeReferences.EntityModelType;
 
 import io.github.krloxz.fws.freelancer.application.FreelancerDto;
 import io.github.krloxz.fws.test.FwsApplicationTest;
@@ -26,22 +29,60 @@ public class FreelancersApiTest {
         .freelancers(tonyStark(), steveRogers()).registered()
         .then()
         .freelancers()
-        .extracting(FreelancerDto::firstName)
-        .contains("Tony", "Steve");
+        .expectStatus().isOk()
+        .expectBody()
+        .jsonPath("_embedded.freelancers[*].firstName").value(hasItems("Tony", "Steve"));
   }
 
   @Test
-  void failsToRegisterFreelancersWhenDataIsInvalid() {
+  void reportsValidationErrorWhenRegisteringFreelancersWithInvalidData() {
     this.fwsApplication.running()
         .when()
         .freelancers(invalidFreelancer()).registered()
         .then()
         .response()
-        .hasProblemThat()
-        .hasStatus(HttpStatus.BAD_REQUEST)
-        .hasValidationErrorsThat()
-        .extracting("attribute")
-        .contains("firstName", "lastName");
+        .expectStatus().isBadRequest()
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/validation-error.html")
+        .jsonPath("errors").isArray()
+        .jsonPath("errors").isNotEmpty();
+  }
+
+  @Test
+  void retrievesRegisteredFreelancers() {
+    final var selfLink = this.fwsApplication.running()
+        .when()
+        .freelancers(tonyStark()).registered()
+        .then()
+        .response()
+        .expectStatus().isCreated()
+        .expectBody(new EntityModelType<FreelancerDto>() {})
+        .returnResult()
+        .getResponseBody()
+        .getRequiredLink(IanaLinkRelations.SELF)
+        .getHref()
+        .split("/")[1];
+
+    this.fwsApplication.running()
+        .when()
+        .freelancers().retrieved(selfLink)
+        .then()
+        .response()
+        .expectStatus().isOk()
+        .expectBody()
+        .jsonPath("firstName").isEqualTo("Tony");
+  }
+
+  @Test
+  void reportsNotFoundErrorWhenRetrievingUnregisteredFreelancers() {
+    this.fwsApplication.running()
+        .when()
+        .freelancers().retrieved("UNREGISTERED")
+        .then()
+        .response()
+        .expectStatus().isNotFound()
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
   }
 
   private static FreelancerDto tonyStark() {

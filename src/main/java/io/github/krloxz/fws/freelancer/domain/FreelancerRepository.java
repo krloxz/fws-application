@@ -14,4 +14,6 @@ public interface FreelancerRepository {
 
   Flux<Freelancer> findAll();
 
+  Mono<Freelancer> findById(FreelancerId id);
+
 }

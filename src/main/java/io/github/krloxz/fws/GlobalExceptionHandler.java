@@ -109,7 +109,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
     if (body == null && exception instanceof final ErrorResponse errorResponse) {
       final var problem = errorResponse.updateAndGetBody(getMessageSource(), getLocale(exchange));
-      problem.setType(exchange.getRequest().getURI().resolve("probs/error.html"));
+      problem.setType(exchange.getRequest().getURI().resolve("/probs/error.html"));
       return createResponseEntity(problem, headers, status, exchange);
     }
     return createResponseEntity(body, headers, status, exchange);
