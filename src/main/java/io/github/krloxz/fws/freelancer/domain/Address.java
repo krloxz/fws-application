@@ -15,12 +15,12 @@ public interface Address {
 
   String state();
 
+  String zipCode();
+
   @Value.Default
   default String country() {
     return "USA";
   }
-
-  String zipCode();
 
   static ImmutableAddress.Builder builder() {
     return ImmutableAddress.builder();

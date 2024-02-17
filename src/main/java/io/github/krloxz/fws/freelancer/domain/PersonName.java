@@ -13,18 +13,8 @@ public interface PersonName {
 
   Optional<String> middle();
 
-  static PersonName of(final String first, final String last) {
-    return ImmutablePersonName.builder()
-        .first(first)
-        .last(last)
-        .build();
+  static ImmutablePersonName.Builder builder() {
+    return ImmutablePersonName.builder();
   }
 
-  static PersonName of(final String first, final String last, final String middle) {
-    return ImmutablePersonName.builder()
-        .first(first)
-        .last(last)
-        .middle(middle)
-        .build();
-  }
 }

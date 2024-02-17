@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.krloxz.fws.freelancer.application.dtos.AddressDtoBuilder;
+import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDtoBuilder;
+import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 import io.github.krloxz.fws.freelancer.domain.Address;
 import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerId;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
-import io.github.krloxz.fws.freelancer.domain.Gender;
 import io.github.krloxz.fws.freelancer.domain.HourlyWage;
 import io.github.krloxz.fws.freelancer.domain.PersonName;
 import reactor.core.publisher.Flux;
@@ -88,30 +92,61 @@ public class FreelancersApiController {
     }
   }
 
-  FreelancerDto toDto(final Freelancer freelancer) {
-    return new FreelancerDto(
-        freelancer.id().value().toString(),
-        freelancer.name().first(),
-        freelancer.name().last());
+  private FreelancerDto toDto(final Freelancer freelancer) {
+    return new FreelancerDtoBuilder()
+        .id(freelancer.id().value().toString())
+        .firstName(freelancer.name().first())
+        .lastName(freelancer.name().last())
+        .middleName(freelancer.name().middle())
+        .gender(freelancer.gender())
+        .birthDate(freelancer.birthDate())
+        .address(
+            new AddressDtoBuilder()
+                .street(freelancer.address().street())
+                .apartment(freelancer.address().apartment())
+                .city(freelancer.address().city())
+                .state(freelancer.address().state())
+                .zipCode(freelancer.address().zipCode())
+                .country(freelancer.address().country())
+                .build())
+        .wage(new HourlyWageDto(freelancer.wage().value(), freelancer.wage().currency().getDisplayName()))
+        .nicknames(freelancer.nicknames())
+        .communicationChannels(freelancer.communicationChannels().stream().map(this::toDto).toList())
+        .build();
   }
 
-  Freelancer toFreelancer(final FreelancerDto dto) {
+  private CommunicationChannelDto toDto(final CommunicationChannel channel) {
+    return new CommunicationChannelDto(channel.value(), channel.type());
+  }
+
+  private Freelancer toFreelancer(final FreelancerDto dto) {
     return Freelancer.builder()
         .id(FreelancerId.create())
-        .name(PersonName.of(dto.firstName(), dto.lastName()))
-        .gender(Gender.MALE)
+        .name(
+            PersonName.builder()
+                .first(dto.firstName())
+                .last(dto.lastName())
+                .middle(dto.middleName())
+                .build())
+        .gender(dto.gender())
+        .birthDate(dto.birthDate())
         .address(
             Address.builder()
-                .street("1 Main St")
-                .city("Boston")
-                .state("MA")
-                .zipCode("01234")
+                .street(dto.address().street())
+                .apartment(dto.address().apartment())
+                .city(dto.address().city())
+                .state(dto.address().state())
+                .zipCode(dto.address().zipCode())
+                .country(dto.address().country())
                 .build())
-        .wage(HourlyWage.of("50.00", "USD"))
-        .addNickname("Freelancer")
-        .addCommunicationChannel(
-            CommunicationChannel.of("freelancer@freelancer.com", CommunicationChannel.Type.EMAIL))
+        .wage(HourlyWage.of(dto.wage().value(), dto.wage().currency()))
+        .nicknames(dto.nicknames())
+        .communicationChannels(dto.communicationChannels().stream().map(this::toChannel).toList())
         .build();
+  }
+
+  private CommunicationChannel toChannel(final CommunicationChannelDto dto) {
+    return CommunicationChannel.of(dto.value(), dto.type());
   }
 
 }

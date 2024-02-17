@@ -8,6 +8,7 @@ import org.springframework.hateoas.server.reactive.WebFluxLinkBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +23,7 @@ class FreelancerAssembler implements ReactiveRepresentationModelAssembler<Freela
 
   @Override
   public Mono<EntityModel<FreelancerDto>> toModel(final FreelancerDto dto, final ServerWebExchange exchange) {
-    final var getOneMethod = WebFluxLinkBuilder.methodOn(FreelancersApiController.class).getOne(dto.id());
+    final var getOneMethod = WebFluxLinkBuilder.methodOn(FreelancersApiController.class).getOne(dto.id().orElse(""));
     return WebFluxLinkBuilder.linkTo(getOneMethod, exchange)
         .withSelfRel()
         .toMono()

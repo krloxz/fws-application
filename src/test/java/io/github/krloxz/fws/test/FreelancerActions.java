@@ -7,7 +7,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
-import io.github.krloxz.fws.freelancer.application.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 
 /**
  * Actions to invoke the Freelancers API.

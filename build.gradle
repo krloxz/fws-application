@@ -38,6 +38,7 @@ dependencies {
 
   // Immutables
   implementation "org.immutables:value-annotations:${immutablesVersion}"
+  implementation "org.immutables:builder:${immutablesVersion}"
   annotationProcessor "org.immutables:value-processor:${immutablesVersion}"
   testAnnotationProcessor "org.immutables:value-processor:${immutablesVersion}"
 
@@ -48,6 +49,9 @@ dependencies {
   implementation 'org.flywaydb:flyway-core'
   jooqGenerator 'org.jooq:jooq-meta-extensions'
   runtimeOnly 'io.r2dbc:r2dbc-h2'
+
+  // Required by @org.springframework.lang.Nullable
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
   // Testing
   testImplementation 'org.springframework.boot:spring-boot-starter-test'

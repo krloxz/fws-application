@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import io.github.krloxz.fws.freelancer.application.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 
 /**
  * Entry point to execute actions that invoke the functionalities of the FwsApplication.

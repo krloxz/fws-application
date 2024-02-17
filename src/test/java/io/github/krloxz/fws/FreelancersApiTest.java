@@ -2,12 +2,21 @@ package io.github.krloxz.fws;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.server.core.TypeReferences.EntityModelType;
 
-import io.github.krloxz.fws.freelancer.application.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.AddressDtoBuilder;
+import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDtoBuilder;
+import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
+import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
+import io.github.krloxz.fws.freelancer.domain.Gender;
 import io.github.krloxz.fws.test.FwsApplicationTest;
 import io.github.krloxz.fws.test.TestFwsApplication;
 
@@ -86,15 +95,50 @@ public class FreelancersApiTest {
   }
 
   private static FreelancerDto tonyStark() {
-    return new FreelancerDto("Tony", "Stark");
+    return new FreelancerDtoBuilder()
+        .firstName("Tony")
+        .middleName("E")
+        .lastName("Stark")
+        .gender(Gender.MALE)
+        .birthDate(LocalDate.parse("1970-05-29"))
+        .address(
+            new AddressDtoBuilder()
+                .street("10880 Malibu Point")
+                .city("Malibu")
+                .state("CA")
+                .zipCode("90265")
+                .country("USA")
+                .build())
+        .wage(new HourlyWageDto(new BigDecimal("5000000"), "USD"))
+        .addNickname("Iron Man")
+        .addCommunicationChannel(
+            new CommunicationChannelDto("ironman@avengers.org", CommunicationChannel.Type.EMAIL))
+        .build();
   }
 
   private static FreelancerDto steveRogers() {
-    return new FreelancerDto("Steve", "Rogers");
+    return new FreelancerDtoBuilder()
+        .firstName("Steve")
+        .lastName("Rogers")
+        .gender(Gender.MALE)
+        .birthDate(LocalDate.parse("1918-07-04"))
+        .address(
+            new AddressDtoBuilder()
+                .street("569 Leaman Place")
+                .city("Brooklyn Heights")
+                .state("NY")
+                .zipCode("11201")
+                .country("USA")
+                .build())
+        .wage(new HourlyWageDto(new BigDecimal("500"), "USD"))
+        .addNickname("Captain America")
+        .addCommunicationChannel(
+            new CommunicationChannelDto("cap@avengers.org", CommunicationChannel.Type.EMAIL))
+        .build();
   }
 
   private static FreelancerDto invalidFreelancer() {
-    return new FreelancerDto(null, null);
+    return new FreelancerDtoBuilder().build();
   }
 
 }

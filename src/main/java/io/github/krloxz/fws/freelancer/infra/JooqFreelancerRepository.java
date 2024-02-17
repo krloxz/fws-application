@@ -66,13 +66,13 @@ class JooqFreelancerRepository implements FreelancerRepository {
     return Flux.from(
         this.create.select(FREELANCERS.ID).from(FREELANCERS).orderBy(FREELANCERS.FIRST_NAME))
         .<UUID>map(Record1::value1)
-        .flatMap(this::findFreelancer)
+        .flatMap(this::findRecordById)
         .map(this::toFreelancer);
   }
 
   @Override
   public Mono<Freelancer> findById(final FreelancerId id) {
-    return findFreelancer(id.value()).map(this::toFreelancer);
+    return findRecordById(id.value()).map(this::toFreelancer);
   }
 
   private FreelancersRecord toFreelancersRecord(final Freelancer freelancer) {
@@ -82,6 +82,7 @@ class JooqFreelancerRepository implements FreelancerRepository {
         .setLastName(freelancer.name().last())
         .setMiddleName(freelancer.name().middle().orElse(null))
         .setGender(freelancer.gender().map(Gender::name).orElse(null))
+        .setBirthDate(freelancer.birthDate())
         .setNicknames(freelancer.nicknames().stream().collect(joining(",")))
         .setHourlyWageValue(freelancer.wage().value())
         .setHourlyWageCurrency(freelancer.wage().currency().getCurrencyCode());
@@ -109,7 +110,7 @@ class JooqFreelancerRepository implements FreelancerRepository {
                 .setType(channel.type().name()));
   }
 
-  private Mono<List<Record>> findFreelancer(final UUID id) {
+  private Mono<List<Record>> findRecordById(final UUID id) {
     return Flux.from(
         this.create.select(DSL.asterisk())
             .from(FREELANCERS)
@@ -124,11 +125,15 @@ class JooqFreelancerRepository implements FreelancerRepository {
     return Freelancer.builder()
         .id(FreelancerId.of(record.getId()))
         .name(
-            PersonName.of(record.getFirstName(), record.getLastName()))
+            PersonName.builder()
+                .first(record.getFirstName())
+                .last(record.getLastName())
+                .middle(Optional.ofNullable(record.getMiddleName()))
+                .build())
         .gender(Optional.ofNullable(record.getGender()).map(Gender::valueOf))
+        .birthDate(record.getBirthDate())
         .address(toAddress(result))
-        .wage(
-            HourlyWage.of(record.getHourlyWageValue().toPlainString(), record.getHourlyWageCurrency()))
+        .wage(HourlyWage.of(record.getHourlyWageValue(), record.getHourlyWageCurrency()))
         .nicknames(Set.of(record.getNicknames().split(",")))
         .communicationChannels(toCommunicationChannels(result))
         .build();

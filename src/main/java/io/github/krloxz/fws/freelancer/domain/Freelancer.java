@@ -1,5 +1,6 @@
 package io.github.krloxz.fws.freelancer.domain;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,6 +15,8 @@ public abstract class Freelancer {
   public abstract PersonName name();
 
   public abstract Optional<Gender> gender();
+
+  public abstract LocalDate birthDate();
 
   // TODO: add speciality and skills
 

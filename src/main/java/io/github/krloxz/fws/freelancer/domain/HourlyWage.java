@@ -12,9 +12,9 @@ public interface HourlyWage {
 
   Currency currency();
 
-  static HourlyWage of(final String value, final String currency) {
+  static HourlyWage of(final BigDecimal value, final String currency) {
     return ImmutableHourlyWage.builder()
-        .value(new BigDecimal(value))
+        .value(value)
         .currency(Currency.getInstance(currency))
         .build();
   }
