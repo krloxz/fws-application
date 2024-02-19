@@ -26,7 +26,7 @@ import io.github.krloxz.fws.test.TestFwsApplication;
  * @author Carlos Gomez
  */
 @FwsApplicationTest
-public class FreelancersApiTest {
+class FreelancersApiTest {
 
   @Autowired
   private TestFwsApplication fwsApplication;

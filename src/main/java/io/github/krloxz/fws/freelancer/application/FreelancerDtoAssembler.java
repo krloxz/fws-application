@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
  * @author Carlos Gomez
  */
 @Component
-class FreelancerAssembler implements ReactiveRepresentationModelAssembler<FreelancerDto, EntityModel<FreelancerDto>> {
+class FreelancerDtoAssembler implements ReactiveRepresentationModelAssembler<FreelancerDto, EntityModel<FreelancerDto>> {
 
   @Override
   public Mono<EntityModel<FreelancerDto>> toModel(final FreelancerDto dto, final ServerWebExchange exchange) {

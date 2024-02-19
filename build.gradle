@@ -25,6 +25,7 @@ repositories {
 
 ext {
   set('immutablesVersion', '2.9.3')
+  set('mapstructVersion', '1.5.5.Final')
   set('jooq.version', jooq.version.get())
   set('junit-jupiter.version', '5.10.0')
 }
@@ -41,6 +42,13 @@ dependencies {
   implementation "org.immutables:builder:${immutablesVersion}"
   annotationProcessor "org.immutables:value-processor:${immutablesVersion}"
   testAnnotationProcessor "org.immutables:value-processor:${immutablesVersion}"
+  
+  // Mapping framework
+  implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+  annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+  testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+  annotationProcessor files('buildSrc/build/libs/buildSrc.jar')
+  testAnnotationProcessor files('buildSrc/build/libs/buildSrc.jar')
 
   // Data access
   implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
@@ -97,7 +105,6 @@ jooq {
           generate {
             relations = true
             records = true
-            immutablePojos = true
             fluentSetters = true
           }
           target {

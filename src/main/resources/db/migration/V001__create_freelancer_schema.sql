@@ -1,7 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS freelancer;
 
 CREATE TABLE IF NOT EXISTS freelancer.freelancers(
-  id UUID NOT NULL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
   middle_name TEXT,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS freelancer.addresses(
 
 CREATE TABLE IF NOT EXISTS freelancer.communication_channels(
   freelancer_id UUID NOT NULL,
-  value1 TEXT NOT NULL,
+  value_ TEXT NOT NULL,
   type TEXT NOT NULL,
   
   CONSTRAINT communication_channel_freelancer_fk
