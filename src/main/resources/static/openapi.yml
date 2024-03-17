@@ -2,6 +2,9 @@ openapi: "3.0.2"
 info:
   title: Freelancer Web Services API
   version: "0.1"
+  description: >
+    The Freelancer Web Services API is a RESTful API that allows the registration and retrieval of freelancers.
+    It is a simple API that serves as a reference for the development of RESTful APIs.
 paths:
   /:
     get:
@@ -42,21 +45,27 @@ paths:
           content:
             application/hal+json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Entity"
-                  - type: object
+                type: object
+                required:
+                  - _embedded
+                  - _links
+                properties:
+                  _embedded:
+                    type: object
                     required:
-                      - _embedded
+                      - freelancers
                     properties:
-                      _embedded:
-                        type: object
-                        required:
-                          - freelancers
-                        properties:
-                          freelancers:
-                            type: array
-                            items:
-                              $ref: "#/components/schemas/Freelancer"
+                      freelancers:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Freelancer"
+                  _links:
+                    type: object
+                    required:
+                      - self
+                    properties:
+                      self:
+                        $ref: "#/components/schemas/Link"
         default:
           $ref: "#/components/responses/Error"
     post:
@@ -100,46 +109,175 @@ paths:
                 $ref: "#/components/schemas/Freelancer"
         default:
           $ref: "#/components/responses/Error"
+  /freelancers/{id}/address:
+    patch:
+      tags:
+        - Freelancers
+      description: Updates the address of a registered freelancer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a freelancer already registered.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+        default:
+          $ref: "#/components/responses/Error"
 
 components:
   schemas:
     Freelancer:
-      allOf:
-        - type: object
-          required:
-            - firstName
-            - lastName
-          properties:
-            id:
-              type: string
-              example: 1
-            firstName:
-              type: string
-              example: Tony
-            lastName:
-              type: string
-              example: Stark
-        - $ref: "#/components/schemas/Entity"
-    Entity:
       type: object
-      required:
-        - _links
+      description: Information about a freelancer
       properties:
+        id:
+          type: string
+          description: Unique identifier for the freelancer
+          example: "fa8508ed-8b7b-4be7-b372-ac1094c709b5"
+        firstName:
+          type: string
+          description: First name of the freelancer
+          example: "Tony"
+        middleName:
+          type: string
+          nullable: true
+          description: Optional middle name of the freelancer
+          example: "E"
+        lastName:
+          type: string
+          description: Last name of the freelancer
+          example: "Stark"
+        gender:
+          type: string
+          description: Gender of the freelancer
+          example: "MALE"
+        birthDate:
+          type: string
+          format: date
+          description: Birth date of the freelancer
+          example: "1970-05-29"
+        address:
+          $ref: "#/components/schemas/Address"
+        wage:
+          type: object
+          description: Wage information of the freelancer
+          required:
+            - value
+            - currency
+          properties:
+            value:
+              type: number
+              format: float
+              description: Wage value
+              example: 5000000.00
+            currency:
+              type: string
+              description: Wage currency
+              example: "USD"
+        nicknames:
+          type: array
+          description: List of nicknames for the freelancer
+          items:
+            type: string
+          example: ["Iron Man"]
+        communicationChannels:
+          type: array
+          description: List of communication channels for the freelancer
+          items:
+            type: object
+            required:
+              - value
+              - type
+            properties:
+              value:
+                type: string
+                description: Communication channel value (e.g., email address)
+                example: "ironman@avengers.org"
+              type:
+                type: string
+                enum:
+                  - MOBILE
+                  - PHONE
+                  - EMAIL
+                  - URL
+                description: Type of communication channel (e.g., EMAIL)
+                example: "EMAIL"
         _links:
           type: object
+          description: Links for subresources and actions available for the freelancer
           required:
             - self
+            - changeAddress
           properties:
+            collection:
+              $ref: "#/components/schemas/Link"
             self:
               $ref: "#/components/schemas/Link"
+            changeAddress:
+              $ref: "#/components/schemas/Link"
+      required:
+        - id
+        - firstName
+        - lastName
+        - address
+        - wage
+        - _links
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: "10880 Malibu Point"
+        apartment:
+          type: string
+          nullable: true
+          example: "Apt 1A"
+        city:
+          type: string
+          example: "Malibu"
+        state:
+          type: string
+          example: "CA"
+        zipCode:
+          type: string
+          example: "90265"
+        country:
+          type: string
+          example: "USA"
+      required:
+        - street
+        - city
+        - state
+        - zipCode
+        - country
     Link:
       type: object
-      required:
-        - href
+      description: Link to a resource or action
       properties:
         href:
           type: string
-          example: resource/uri
+          description: URI of the resource or action
+          example: "freelancers/fa8508ed-8b7b-4be7-b372-ac1094c709b5"
+        method:
+          type: string
+          description: HTTP method for the link
+          example: "GET"
+      required:
+        - href
+        - method
 
   responses:
     Error:
@@ -150,11 +288,6 @@ components:
         application/problem+json:
           schema:
             type: object
-            required:
-              - type
-              - title
-              - status
-              - instance
             properties:
               type:
                 description: A URI reference that identifies the problem type.
@@ -198,3 +331,8 @@ components:
                       description: A human-readable description of the error
                       type: string
                       example: must not be blank
+            required:
+              - type
+              - title
+              - status
+              - instance

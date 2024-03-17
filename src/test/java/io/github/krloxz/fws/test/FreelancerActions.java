@@ -7,6 +7,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
+import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 
 /**
@@ -58,12 +59,36 @@ public class FreelancerActions {
     return this.applicationActions;
   }
 
+  /**
+   * Invokes the endpoint that moves a freelancer to a new address.
+   *
+   * @param newAddress
+   *        the new address
+   * @return the {@link FwsApplicationActions}
+   */
+  public FwsApplicationActions movesTo(final AddressDto newAddress) {
+    this.actionRecorder.add(
+        () -> this.webClient.patch()
+            .uri("/freelancers/" + freelancerId() + "/address")
+            .accept(MediaTypes.HAL_JSON)
+            .bodyValue(newAddress)
+            .exchange());
+    return this.applicationActions;
+  }
+
   private Supplier<ResponseSpec> register(final FreelancerDto freelancer) {
     return () -> this.webClient.post()
         .uri("/freelancers")
         .accept(MediaTypes.HAL_JSON)
         .bodyValue(freelancer)
         .exchange();
+  }
+
+  private String freelancerId() {
+    if (this.freelancers.size() != 1) {
+      throw new IllegalStateException("There are " + this.freelancers.size() + " freelancers, only one is expected.");
+    }
+    return this.freelancers.get(0).id().orElseThrow();
   }
 
 }

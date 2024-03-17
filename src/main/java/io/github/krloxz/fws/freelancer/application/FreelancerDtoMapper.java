@@ -7,7 +7,9 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
+import io.github.krloxz.fws.freelancer.domain.Address;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerId;
 
@@ -28,6 +30,8 @@ abstract class FreelancerDtoMapper {
 
   @InheritInverseConfiguration
   public abstract Freelancer fromDto(FreelancerDto dto);
+
+  public abstract Address fromAddressDto(AddressDto dto);
 
   FreelancerId fromDtoId(final Optional<String> id) {
     return id.map(UUID::fromString)

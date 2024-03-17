@@ -6,54 +6,150 @@ import java.util.Set;
 
 import org.immutables.value.Value;
 
+/**
+ * Represents a freelancer.
+ *
+ * @author Carlos Gomez
+ */
 @Value.Immutable
 @Value.Style(depluralize = true)
 public abstract class Freelancer {
 
+  /**
+   * @return the unique identifier of this freelancer
+   */
   public abstract FreelancerId id();
 
+  /**
+   * @return the name of this freelancer
+   */
   public abstract PersonName name();
 
+  /**
+   * @return the email of this freelancer
+   */
   public abstract Optional<Gender> gender();
 
+  /**
+   * @return the birth date of this freelancer
+   */
   public abstract LocalDate birthDate();
 
   // TODO: add speciality and skills
 
+  /**
+   * @return the address of this freelancer
+   */
   public abstract Address address();
 
+  /**
+   * @return the hourly wage of this freelancer
+   */
   public abstract HourlyWage wage();
 
+  /**
+   * @return the nicknames of this freelancer
+   */
   public abstract Set<String> nicknames();
 
+  /**
+   * @return the communication channels of this freelancer
+   */
   public abstract Set<CommunicationChannel> communicationChannels();
 
+  /**
+   * Creates a new builder for the Freelancer class.
+   *
+   * @return a new instance of the builder
+   */
   public static ImmutableFreelancer.Builder builder() {
     return ImmutableFreelancer.builder();
   }
 
+  /**
+   * Creates a new instance of freelancer class with the given address.
+   *
+   * @param newAddress
+   *        the new address
+   * @return a new instance of freelancer class with the given address
+   */
   public Freelancer movedTo(final Address newAddress) {
-    return null;
+    return Freelancer.builder()
+        .from(this)
+        .address(newAddress)
+        .build();
   }
 
+  /**
+   * Adds a new nickname to this freelancer.
+   *
+   * @param nickName
+   *        the new nickname
+   * @return a new instance of freelancer with the added nickname
+   */
   public Freelancer add(final String nickName) {
-    return null;
+    return Freelancer.builder()
+        .from(this)
+        .addNicknames(nickName)
+        .build();
   }
 
+  /**
+   * Adds a new communication channel to this freelancer.
+   *
+   * @param channel
+   *        the new communication channel
+   * @return a new instance of freelancer with the added communication channel
+   */
   public Freelancer add(final CommunicationChannel channel) {
-    return null;
+    return Freelancer.builder()
+        .from(this)
+        .addCommunicationChannels(channel)
+        .build();
   }
 
+  /**
+   * Removes a nickname from this freelancer.
+   *
+   * @param nickName
+   *        the nickname to be removed
+   * @return a new instance of freelancer with the removed nickname
+   */
   public Freelancer remove(final String nickName) {
-    return null;
+    final var newNicknames = nicknames().stream().filter(nick -> !nick.equals(nickName)).toList();
+    return Freelancer.builder()
+        .from(this)
+        .nicknames(newNicknames)
+        .build();
   }
 
+  /**
+   * Removes a communication channel from this freelancer.
+   *
+   * @param channel
+   *        the communication channel to be removed
+   * @return a new instance of freelancer with the removed communication channel
+   */
   public Freelancer remove(final CommunicationChannel channel) {
-    return null;
+    final var newChannels = communicationChannels().stream().filter(c -> !c.equals(channel)).toList();
+    return Freelancer.builder()
+        .from(this)
+        .communicationChannels(newChannels)
+        .build();
   }
 
+  /**
+   * Updates the hourly wage of this freelancer.
+   *
+   * @param wage
+   *        the new hourly wage
+   * @return a new instance of freelancer with the updated hourly wage
+   */
   public Freelancer update(final HourlyWage wage) {
-    return null;
+    return Freelancer.builder()
+        .from(this)
+        .wage(wage)
+        .build();
   }
 
 }

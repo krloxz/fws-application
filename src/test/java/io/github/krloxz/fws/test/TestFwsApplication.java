@@ -34,4 +34,11 @@ public class TestFwsApplication {
     return this.initializers;
   }
 
+  /**
+   * Synonym for {@link #running()}. Just syntactic sugar to improve readability.
+   */
+  public FwsApplicationInitializers runningWith() {
+    return this.initializers;
+  }
+
 }

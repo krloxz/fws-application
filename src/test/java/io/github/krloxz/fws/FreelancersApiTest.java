@@ -94,8 +94,39 @@ class FreelancersApiTest {
         .jsonPath("type").isEqualTo("/probs/error.html");
   }
 
+  @Test
+  void updatesFreelancerWhenMovingToNewAddress() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
+        .when()
+        .freelancers(tonyStark()).movesTo(steveRogers().address())
+        .then()
+        .freelancers()
+        .expectBody()
+        .jsonPath("_embedded.freelancers[0].address.street").isEqualTo(steveRogers().address().street())
+        .jsonPath("_embedded.freelancers[0].address.apartment")
+        .isEqualTo(steveRogers().address().apartment().orElseThrow())
+        .jsonPath("_embedded.freelancers[0].address.city").isEqualTo(steveRogers().address().city())
+        .jsonPath("_embedded.freelancers[0].address.state").isEqualTo(steveRogers().address().state())
+        .jsonPath("_embedded.freelancers[0].address.zipCode").isEqualTo(steveRogers().address().zipCode())
+        .jsonPath("_embedded.freelancers[0].address.country").isEqualTo(steveRogers().address().country());
+  }
+
+  @Test
+  void reportsNotFoundErrorWhenUpdatingAddressOfUnregisteredFreelancers() {
+    this.fwsApplication.running()
+        .when()
+        .freelancers(tonyStark()).movesTo(steveRogers().address())
+        .then()
+        .response()
+        .expectStatus().isNotFound()
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
+  }
+
   private static FreelancerDto tonyStark() {
     return new FreelancerDtoBuilder()
+        .id("fa8508ed-8b7b-4be7-b372-ac1094c709b5")
         .firstName("Tony")
         .middleName("E")
         .lastName("Stark")
@@ -125,6 +156,7 @@ class FreelancersApiTest {
         .address(
             new AddressDtoBuilder()
                 .street("569 Leaman Place")
+                .apartment("Apt 2A")
                 .city("Brooklyn Heights")
                 .state("NY")
                 .zipCode("11201")

@@ -1,14 +1,16 @@
 package io.github.krloxz.fws;
 
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
+
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.server.reactive.WebFluxLinkBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
 import io.github.krloxz.fws.freelancer.application.FreelancersApiController;
-import reactor.core.publisher.Flux;
+import io.github.krloxz.fws.springframework.AffordanceLink;
 import reactor.core.publisher.Mono;
 
 /**
@@ -27,16 +29,13 @@ public class FwsApiController {
    */
   @GetMapping
   public Mono<CollectionModel<Object>> getResources(final ServerWebExchange exchange) {
-    final var resources = WebFluxLinkBuilder.methodOn(FwsApiController.class).getResources(exchange);
-    final var freelancersApi = WebFluxLinkBuilder.methodOn(FreelancersApiController.class).getAll();
-    return Flux.concat(
-        WebFluxLinkBuilder.linkTo(resources, exchange)
-            .withSelfRel()
-            .toMono())
+    return linkTo(methodOn(FwsApiController.class).getResources(exchange), exchange)
+        .withSelfRel()
+        .toMono(AffordanceLink::new)
         .concatWith(
-            WebFluxLinkBuilder.linkTo(freelancersApi, exchange)
+            linkTo(methodOn(FreelancersApiController.class).getAll(), exchange)
                 .withRel("freelancers")
-                .toMono())
+                .toMono(AffordanceLink::new))
         .collectList()
         .map(CollectionModel::empty);
   }
