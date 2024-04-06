@@ -1,6 +1,6 @@
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '3.2.3'
+  id 'org.springframework.boot' version '3.2.4'
   id 'io.spring.dependency-management' version '1.1.4'
   id 'com.diffplug.eclipse.apt' version '3.44.0'
   id 'nu.studer.jooq' version '9.0'
@@ -132,9 +132,8 @@ test {
   afterSuite { desc, result ->
     if (!desc.parent) { // will match the outermost suite
       def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-      def startItem = '|  ', endItem = '  |'
-      def repeatLength = startItem.length() + output.length() + endItem.length()
-      println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+      def repeatLength = output.length()
+      println('\n' + ('-' * output.length()) + '\n' + output + '\n' + ('-' * output.length()))
     }
   }
 }

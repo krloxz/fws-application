@@ -8,6 +8,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
+import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 
 /**
@@ -72,6 +73,23 @@ public class FreelancerActions {
             .uri("/freelancers/" + freelancerId() + "/address")
             .accept(MediaTypes.HAL_JSON)
             .bodyValue(newAddress)
+            .exchange());
+    return this.applicationActions;
+  }
+
+  /**
+   * Registers an action to invoke the endpoint that adds a communication channel.
+   *
+   * @param channel
+   *        the communication channel to add
+   * @return the {@link FwsApplicationActions}
+   */
+  public FwsApplicationActions addsCommunicationChannel(final CommunicationChannelDto channel) {
+    this.actionRecorder.add(
+        () -> this.webClient.post()
+            .uri("/freelancers/" + freelancerId() + "/communication-channels")
+            .accept(MediaTypes.HAL_JSON)
+            .bodyValue(channel)
             .exchange());
     return this.applicationActions;
   }

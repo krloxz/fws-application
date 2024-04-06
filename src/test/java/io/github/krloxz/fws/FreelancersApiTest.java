@@ -1,6 +1,9 @@
 package io.github.krloxz.fws;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -124,6 +127,32 @@ class FreelancersApiTest {
         .jsonPath("type").isEqualTo("/probs/error.html");
   }
 
+  @Test
+  void updatesFreelancerWhenAddingCommunicationChannel() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
+        .when()
+        .freelancers(tonyStark()).addsCommunicationChannel(mobile("901-234-8765"))
+        .then()
+        .freelancers()
+        .expectBody()
+        .jsonPath("_embedded.freelancers[0].communicationChannels.length()").value(is(greaterThan(1)))
+        .jsonPath("_embedded.freelancers[0].communicationChannels.[*].value").value(hasItem("901-234-8765"))
+        .jsonPath("_embedded.freelancers[0].communicationChannels.[*].type").value(hasItem("MOBILE"));
+  }
+
+  @Test
+  void reportsNotFoundWhenAddingCommunicationChannelToUnregisteredFreelancer() {
+    this.fwsApplication.runningWith()
+        .when()
+        .freelancers(unregisteredFreelancer()).addsCommunicationChannel(mobile("901-234-8765"))
+        .then()
+        .response()
+        .expectStatus().isNotFound()
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
+  }
+
   private static FreelancerDto tonyStark() {
     return new FreelancerDtoBuilder()
         .id("fa8508ed-8b7b-4be7-b372-ac1094c709b5")
@@ -142,8 +171,7 @@ class FreelancersApiTest {
                 .build())
         .wage(new HourlyWageDto(new BigDecimal("5000000"), "USD"))
         .addNickname("Iron Man")
-        .addCommunicationChannel(
-            new CommunicationChannelDto("ironman@avengers.org", CommunicationChannel.Type.EMAIL))
+        .addCommunicationChannels(email("tony@avengers.org"), email("ironman@avengers.org"))
         .build();
   }
 
@@ -164,13 +192,24 @@ class FreelancersApiTest {
                 .build())
         .wage(new HourlyWageDto(new BigDecimal("500"), "USD"))
         .addNickname("Captain America")
-        .addCommunicationChannel(
-            new CommunicationChannelDto("cap@avengers.org", CommunicationChannel.Type.EMAIL))
+        .addCommunicationChannel(email("cap@avengers.org"))
         .build();
+  }
+
+  private static FreelancerDto unregisteredFreelancer() {
+    return new FreelancerDtoBuilder().id("UNREGISTERED").build();
   }
 
   private static FreelancerDto invalidFreelancer() {
     return new FreelancerDtoBuilder().build();
+  }
+
+  private static CommunicationChannelDto email(final String email) {
+    return new CommunicationChannelDto(email, CommunicationChannel.Type.EMAIL);
+  }
+
+  private static CommunicationChannelDto mobile(final String number) {
+    return new CommunicationChannelDto(number, CommunicationChannel.Type.MOBILE);
   }
 
 }

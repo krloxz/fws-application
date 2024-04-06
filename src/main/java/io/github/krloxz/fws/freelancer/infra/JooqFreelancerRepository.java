@@ -89,11 +89,12 @@ class JooqFreelancerRepository implements FreelancerRepository {
         .where(COMMUNICATION_CHANNELS.FREELANCER_ID.eq(freelancer.id().value()));
   }
 
+  // Looks like batch support is not yet available in jOOQ: https://github.com/jOOQ/jOOQ/issues/14874
   private Batch insertChannels(final Freelancer freelancer) {
     return this.create.batch(
         this.mapper.toCommunicationChannelsRecords(freelancer)
             .stream()
-            .map(this.create.insertInto(COMMUNICATION_CHANNELS)::set)
+            .map(channel -> this.create.insertInto(COMMUNICATION_CHANNELS).set(channel))
             .toList());
   }
 

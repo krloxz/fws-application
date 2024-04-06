@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
+import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerId;
@@ -90,6 +91,31 @@ public class FreelancersApiController {
       @Validated @RequestBody final AddressDto newAddress) {
     return findById(id)
         .map(freelancer -> freelancer.movedTo(this.mapper.fromAddressDto(newAddress)))
+        .flatMap(this.repository::update)
+        .map(this.mapper::toDto);
+  }
+
+  /**
+   * Adds a new communication channel to the freelancer identified by the given identifier.
+   *
+   * @param id
+   *        freelancer identifier
+   * @param channel
+   *        communication channel data
+   * @return a {@link Mono} that emits the updated freelancer's data
+   * @implNote This operation is modeled as the addition of a freelancer sub-resource because a patch
+   *           would imply that the whole sub-resource, a collection of communication channels in this
+   *           case, is updated at once while the actual purpose is to add channels one at a time.
+   *           This may be because of a business requirement or a technology constraint. In any case
+   *           this is an example of how an RPC can be modeled as a state transition: the freelancer
+   *           transitions from not having a link to delete a communication channel to having one.
+   */
+  @PostMapping("/{id}/communication-channels")
+  public Mono<FreelancerDto> addCommunicationChannel(
+      @PathVariable final String id,
+      @Validated @RequestBody final CommunicationChannelDto channel) {
+    return findById(id)
+        .map(freelancer -> freelancer.add(this.mapper.fromDto(channel)))
         .flatMap(this.repository::update)
         .map(this.mapper::toDto);
   }

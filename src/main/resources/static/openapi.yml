@@ -136,6 +136,35 @@ paths:
                 $ref: "#/components/schemas/Freelancer"
         default:
           $ref: "#/components/responses/Error"
+  /freelancers/{id}/communication-channels:
+    post:
+      tags:
+        - Freelancers
+      description: Adds communication channels to a registered freelancer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a freelancer already registered.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CommunicationChannel"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+        default:
+          $ref: "#/components/responses/Error"
 
 components:
   schemas:
@@ -197,24 +226,7 @@ components:
           type: array
           description: List of communication channels for the freelancer
           items:
-            type: object
-            required:
-              - value
-              - type
-            properties:
-              value:
-                type: string
-                description: Communication channel value (e.g., email address)
-                example: "ironman@avengers.org"
-              type:
-                type: string
-                enum:
-                  - MOBILE
-                  - PHONE
-                  - EMAIL
-                  - URL
-                description: Type of communication channel (e.g., EMAIL)
-                example: "EMAIL"
+            $ref: "#/components/schemas/CommunicationChannel"
         _links:
           type: object
           description: Links for subresources and actions available for the freelancer
@@ -263,6 +275,25 @@ components:
         - state
         - zipCode
         - country
+    CommunicationChannel:
+      type: object
+      properties:
+        value:
+          type: string
+          description: Communication channel value (e.g., email address)
+          example: "ironman@avengers.org"
+        type:
+          type: string
+          enum:
+            - MOBILE
+            - PHONE
+            - EMAIL
+            - URL
+          description: Type of communication channel (e.g., EMAIL)
+          example: "EMAIL"
+      required:
+        - value
+        - type
     Link:
       type: object
       description: Link to a resource or action
