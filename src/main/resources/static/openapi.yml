@@ -165,6 +165,33 @@ paths:
                 $ref: "#/components/schemas/Freelancer"
         default:
           $ref: "#/components/responses/Error"
+  /freelancers/{id}/communication-channels/{channelId}:
+    delete:
+      tags:
+        - Freelancers
+      description: Removes communication channels from a registered freelancer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a freelancer already registered.
+        - in: path
+          name: channelId
+          schema:
+            type: string
+          required: true
+          description: Identifier of a communication channel already registered.
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+        default:
+          $ref: "#/components/responses/Error"
 
 components:
   schemas:

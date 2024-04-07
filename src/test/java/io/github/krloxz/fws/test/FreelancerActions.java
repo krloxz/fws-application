@@ -91,6 +91,22 @@ public class FreelancerActions {
     return this.applicationActions;
   }
 
+  /**
+   * Registers an action to invoke the endpoint that removes a communication channel.
+   *
+   * @param id
+   *        the identifier of the communication channel to remove
+   * @return the {@link FwsApplicationActions}
+   */
+  public FwsApplicationActions removesCommunicationChannel(final String id) {
+    this.actionRecorder.add(
+        () -> this.webClient.delete()
+            .uri("/freelancers/" + freelancerId() + "/communication-channels/" + id)
+            .accept(MediaTypes.HAL_JSON)
+            .exchange());
+    return this.applicationActions;
+  }
+
   private String freelancerId() {
     return this.freelancer.id().orElseThrow();
   }

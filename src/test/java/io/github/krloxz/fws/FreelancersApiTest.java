@@ -3,17 +3,21 @@ package io.github.krloxz.fws;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDtoBuilder;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
+import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDtoBuilder;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDtoBuilder;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
@@ -169,6 +173,62 @@ class FreelancersApiTest {
         .jsonPath("type").isEqualTo("/probs/error.html");
   }
 
+  @Test
+  void updatesFreelancerWhenRemovingCommunicationChannel() {
+    final var tonyStark = tonyStark();
+    final var removedChannelId = tonyStark.communicationChannels().iterator().next().id().orElseThrow();
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark)
+        .when()
+        .freelancer(tonyStark).removesCommunicationChannel(removedChannelId)
+        .then()
+        .freelancers()
+        .expectBody()
+        .jsonPath("_embedded.freelancers[0].communicationChannels[*].id").value(not(hasItem(removedChannelId)));
+  }
+
+  @Test
+  void removesAffordancesWhenRemovingAllCommunicationChannels() {
+    final var tonyStark = tonyStark();
+    final var channels = tonyStark.communicationChannels().iterator();
+    final var channel1 = channels.next().id().orElseThrow();
+    final var channel2 = channels.next().id().orElseThrow();
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark)
+        .when()
+        .freelancer(tonyStark).removesCommunicationChannel(channel1)
+        .freelancer(tonyStark).removesCommunicationChannel(channel2)
+        .then()
+        .response()
+        .expectBody()
+        .jsonPath("_links.removeCommunicationChannel").doesNotExist();
+  }
+
+  @Test
+  void reportsNotFoundWhenRemovingCommunicationChannelFromUnregisteredFreelancer() {
+    this.fwsApplication.runningWith()
+        .when()
+        .freelancer(unregistered()).removesCommunicationChannel(UUID.randomUUID().toString())
+        .then()
+        .response()
+        .expectStatus().isNotFound()
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
+  }
+
+  @Test
+  void reportsUnprocessableEntityWhenRemovingNonExistentCommunicationChannel() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
+        .when()
+        .freelancer(tonyStark()).removesCommunicationChannel(UUID.randomUUID().toString())
+        .then()
+        .response()
+        .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
+  }
+
   private static FreelancerDto tonyStark() {
     return new FreelancerDtoBuilder()
         .id("fa8508ed-8b7b-4be7-b372-ac1094c709b5")
@@ -221,11 +281,18 @@ class FreelancersApiTest {
   }
 
   private static CommunicationChannelDto email(final String email) {
-    return new CommunicationChannelDto(email, CommunicationChannel.Type.EMAIL);
+    return new CommunicationChannelDtoBuilder()
+        .id(UUID.randomUUID().toString())
+        .value(email)
+        .type(CommunicationChannel.Type.EMAIL)
+        .build();
   }
 
   private static CommunicationChannelDto mobile(final String number) {
-    return new CommunicationChannelDto(number, CommunicationChannel.Type.MOBILE);
+    return new CommunicationChannelDtoBuilder()
+        .value(number)
+        .type(CommunicationChannel.Type.MOBILE)
+        .build();
   }
 
 }

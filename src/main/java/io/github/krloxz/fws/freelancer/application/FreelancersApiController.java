@@ -103,12 +103,14 @@ public class FreelancersApiController {
    * @param channel
    *        communication channel data
    * @return a {@link Mono} that emits the updated freelancer's data
-   * @implNote This operation is modeled as the addition of a freelancer sub-resource because a patch
-   *           would imply that the whole sub-resource, a collection of communication channels in this
-   *           case, is updated at once while the actual purpose is to add channels one at a time.
-   *           This may be because of a business requirement or a technology constraint. In any case
-   *           this is an example of how an RPC can be modeled as a state transition: the freelancer
-   *           transitions from not having a link to delete a communication channel to having one.
+   * @implNote This operation simulates that there is a business requirement or a technology
+   *           constraint that prevents from managing the whole collection of communication channels
+   *           at once. Therefore, this operation is modeled as the addition of a freelancer
+   *           sub-resource instead of a patch operation.
+   *           <p>
+   *           This operation could be consider an example of how an RPC call can be modeled as a
+   *           state transition since the freelancer transitions from not having a link to delete a
+   *           communication channel to having one.
    */
   @PostMapping("/{id}/communication-channels")
   public Mono<FreelancerDto> addCommunicationChannel(
@@ -120,11 +122,42 @@ public class FreelancersApiController {
         .map(this.mapper::toDto);
   }
 
+  /**
+   * Removes a communication channel from the freelancer identified by the given identifier.
+   *
+   * @param id
+   *        freelancer identifier
+   * @param channelId
+   *        identifier of the communication channel to be removed
+   * @return a {@link Mono} that emits the updated freelancer's data
+   * @implNote This operation simulates that there is a business requirement or a technology
+   *           constraint that prevents from managing the whole collection of communication channels
+   *           at once. Therefore, this operation is modeled as the removal of a freelancer
+   *           sub-resource instead of a patch operation.
+   *           <p>
+   *           This approach may be useful given the context, but turns out to be very complex,
+   *           especially with collection sub-resources:
+   *           <ul>
+   *           <li>In this case the communication channel was converted from a value object into an
+   *           entity because without identity it's impossible to process resources one at a time.
+   *           <li>Entities are more difficult to manage than value objects.
+   *           <li>Affordances to remove communication channels are more complex because the client
+   *           should consider the possibility of having only one or multiple affordances, which is an
+   *           additional challenge for the standardization of the API since there are other
+   *           affordances that will never have multiple items and picking a single model that fits
+   *           all is more difficult.
+   *           </ul>
+   *           I think this approach is valuable to model RPC calls but it's not the best choice to
+   *           manage sub-resources, in that case patch operations look more appropriate.
+   */
   @DeleteMapping("/{id}/communication-channels/{channelId}")
   public Mono<FreelancerDto> removeCommunicationChannel(
       @PathVariable final String id,
       @PathVariable final String channelId) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    return findById(id)
+        .flatMap(freelancer -> removeCommunicationChannel(freelancer, channelId))
+        .flatMap(this.repository::update)
+        .map(this.mapper::toDto);
   }
 
   private Mono<Freelancer> findById(final String id) {
@@ -139,6 +172,16 @@ public class FreelancersApiController {
     } catch (final IllegalArgumentException e) {
       return Mono.empty();
     }
+  }
+
+  private Mono<Freelancer> removeCommunicationChannel(final Freelancer freelancer, final String channelId) {
+    return freelancer.removeCommunicationChannel(UUID.fromString(channelId))
+        .map(Mono::just)
+        .orElse(
+            Mono.error(
+                new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "This communication channel doesn't exist: " + channelId)));
   }
 
 }

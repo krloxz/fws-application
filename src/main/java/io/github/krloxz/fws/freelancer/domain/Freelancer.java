@@ -1,5 +1,7 @@
 package io.github.krloxz.fws.freelancer.domain;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
@@ -114,7 +116,7 @@ public abstract class Freelancer {
    *
    * @param nickName
    *        the nickname to be removed
-   * @return a new instance of freelancer with the removed nickname
+   * @return a new instance of freelancer with the nickname removed
    */
   public Freelancer remove(final String nickName) {
     final var newNicknames = nicknames().stream().filter(nick -> !nick.equals(nickName)).toList();
@@ -127,16 +129,23 @@ public abstract class Freelancer {
   /**
    * Removes a communication channel from this freelancer.
    *
-   * @param channel
-   *        the communication channel to be removed
-   * @return a new instance of freelancer with the removed communication channel
+   * @param id
+   *        the identifier of the communication channel to be removed
+   * @return an {@link Optional} with a new instance of freelancer with the communication channel
+   *         removed when the channel was found, an empty {@link Optional} otherwise
    */
-  public Freelancer remove(final CommunicationChannel channel) {
-    final var newChannels = communicationChannels().stream().filter(c -> !c.equals(channel)).toList();
-    return Freelancer.builder()
-        .from(this)
-        .communicationChannels(newChannels)
-        .build();
+  public Optional<Freelancer> removeCommunicationChannel(final UUID id) {
+    final var newChannels = communicationChannels().stream()
+        .filter(channel -> !channel.id().equals(id))
+        .collect(toSet());
+    if (newChannels.size() == communicationChannels().size()) {
+      return Optional.empty();
+    }
+    return Optional.of(
+        Freelancer.builder()
+            .from(this)
+            .communicationChannels(newChannels)
+            .build());
   }
 
   /**
