@@ -3,6 +3,7 @@ package io.github.krloxz.fws.freelancer.domain;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.immutables.value.Value;
 
@@ -18,7 +19,7 @@ public abstract class Freelancer {
   /**
    * @return the unique identifier of this freelancer
    */
-  public abstract FreelancerId id();
+  public abstract UUID id();
 
   /**
    * @return the name of this freelancer

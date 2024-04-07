@@ -13,7 +13,6 @@ import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.domain.Address;
 import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
-import io.github.krloxz.fws.freelancer.domain.FreelancerId;
 
 /**
  * Maps {@link Freelancer}'s between the DTO and domain models.
@@ -33,19 +32,9 @@ abstract class FreelancerDtoMapper {
   @InheritInverseConfiguration
   public abstract Freelancer fromDto(FreelancerDto dto);
 
-  public abstract Address fromAddressDto(AddressDto dto);
+  public abstract Address fromDto(AddressDto dto);
 
   public abstract CommunicationChannel fromDto(CommunicationChannelDto dto);
-
-  FreelancerId fromDtoId(final Optional<String> id) {
-    return id.map(UUID::fromString)
-        .map(FreelancerId::of)
-        .orElseGet(FreelancerId::create);
-  }
-
-  Optional<String> toDtoId(final FreelancerId id) {
-    return Optional.of(id.value().toString());
-  }
 
   UUID toUUID(final Optional<String> value) {
     return value.map(UUID::fromString)

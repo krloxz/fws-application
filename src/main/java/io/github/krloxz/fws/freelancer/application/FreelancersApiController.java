@@ -21,7 +21,6 @@ import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
-import io.github.krloxz.fws.freelancer.domain.FreelancerId;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -91,7 +90,7 @@ public class FreelancersApiController {
       @PathVariable final String id,
       @Validated @RequestBody final AddressDto newAddress) {
     return findById(id)
-        .map(freelancer -> freelancer.movedTo(this.mapper.fromAddressDto(newAddress)))
+        .map(freelancer -> freelancer.movedTo(this.mapper.fromDto(newAddress)))
         .flatMap(this.repository::update)
         .map(this.mapper::toDto);
   }
@@ -134,9 +133,9 @@ public class FreelancersApiController {
         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
   }
 
-  private Mono<FreelancerId> toFreelancerId(final String id) {
+  private Mono<UUID> toFreelancerId(final String id) {
     try {
-      return Mono.just(FreelancerId.of(UUID.fromString(id)));
+      return Mono.just(UUID.fromString(id));
     } catch (final IllegalArgumentException e) {
       return Mono.empty();
     }

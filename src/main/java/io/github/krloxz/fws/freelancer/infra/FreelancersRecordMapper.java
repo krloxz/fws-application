@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.jooq.Record;
 import org.mapstruct.Mapper;
@@ -16,7 +17,6 @@ import org.mapstruct.Mapping;
 
 import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
-import io.github.krloxz.fws.freelancer.domain.FreelancerId;
 import io.github.krloxz.fws.freelancer.domain.Gender;
 import io.github.krloxz.fws.infra.jooq.tables.records.AddressesRecord;
 import io.github.krloxz.fws.infra.jooq.tables.records.CommunicationChannelsRecord;
@@ -32,7 +32,6 @@ import io.github.krloxz.fws.infra.jooq.tables.records.FreelancersRecord;
 @Mapper(componentModel = "spring")
 abstract class FreelancersRecordMapper {
 
-  @Mapping(target = "id", source = "id.value")
   @Mapping(target = "firstName", source = "name.first")
   @Mapping(target = "lastName", source = "name.last")
   @Mapping(target = "middleName", source = "name.middle")
@@ -40,7 +39,7 @@ abstract class FreelancersRecordMapper {
   @Mapping(target = "hourlyWageCurrency", source = "wage.currency")
   public abstract FreelancersRecord toFreelancersRecord(Freelancer freelancer);
 
-  @Mapping(target = "freelancerId", source = "id.value")
+  @Mapping(target = "freelancerId", source = "id")
   @Mapping(target = ".", source = "address")
   public abstract AddressesRecord toAddressesRecord(Freelancer freelancer);
 
@@ -61,10 +60,9 @@ abstract class FreelancersRecordMapper {
     return fromRecords(freelancersRecord, addressesRecord, channelsRecords);
   }
 
-  @Mapping(target = "freelancerId", source = "id.value")
+  @Mapping(target = "freelancerId", source = "id")
   @Mapping(target = "value_", source = "channel.value")
-  abstract CommunicationChannelsRecord toCommunicationChannelsRecord(
-      CommunicationChannel channel, FreelancerId id);
+  abstract CommunicationChannelsRecord toCommunicationChannelsRecord(CommunicationChannel channel, UUID id);
 
   String toFreelancersRecordNicknames(final Set<String> value) {
     return value.stream().collect(joining(","));
@@ -78,7 +76,6 @@ abstract class FreelancersRecordMapper {
     return value.orElse(null);
   }
 
-  @Mapping(target = "id.value", source = "freelancersRecord.id")
   @Mapping(target = "name.first", source = "freelancersRecord.firstName")
   @Mapping(target = "name.last", source = "freelancersRecord.lastName")
   @Mapping(target = "name.middle", source = "freelancersRecord.middleName")

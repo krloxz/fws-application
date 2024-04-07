@@ -1,5 +1,7 @@
 package io.github.krloxz.fws.freelancer.domain;
 
+import java.util.UUID;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -49,6 +51,6 @@ public interface FreelancerRepository {
    *        the unique identifier of the freelancer to find
    * @return a {@link Mono} with the freelancer, if found
    */
-  Mono<Freelancer> findById(FreelancerId id);
+  Mono<Freelancer> findById(UUID id);
 
 }

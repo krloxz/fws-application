@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
-import io.github.krloxz.fws.freelancer.domain.FreelancerId;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
 import io.github.krloxz.fws.infra.jooq.tables.records.CommunicationChannelsRecord;
 import reactor.core.publisher.Flux;
@@ -60,8 +59,8 @@ class JooqFreelancerRepository implements FreelancerRepository {
     return Flux.from(
         this.create.update(FREELANCERS)
             .set(this.mapper.toFreelancersRecord(freelancer))
-            .where(FREELANCERS.ID.eq(freelancer.id().value())))
-        .thenMany(this.create.delete(ADDRESSES).where(ADDRESSES.FREELANCER_ID.eq(freelancer.id().value())))
+            .where(FREELANCERS.ID.eq(freelancer.id())))
+        .thenMany(this.create.delete(ADDRESSES).where(ADDRESSES.FREELANCER_ID.eq(freelancer.id())))
         .thenMany(this.create.insertInto(ADDRESSES).set(this.mapper.toAddressesRecord(freelancer)))
         .thenMany(deleteChannels(freelancer))
         .thenMany(insertChannels(freelancer))
@@ -78,15 +77,15 @@ class JooqFreelancerRepository implements FreelancerRepository {
   }
 
   @Override
-  public Mono<Freelancer> findById(final FreelancerId id) {
-    return findRecordById(id.value())
+  public Mono<Freelancer> findById(final UUID id) {
+    return findRecordById(id)
         .filter(not(List::isEmpty))
         .map(this.mapper::fromRecords);
   }
 
   private DeleteConditionStep<CommunicationChannelsRecord> deleteChannels(final Freelancer freelancer) {
     return this.create.delete(COMMUNICATION_CHANNELS)
-        .where(COMMUNICATION_CHANNELS.FREELANCER_ID.eq(freelancer.id().value()));
+        .where(COMMUNICATION_CHANNELS.FREELANCER_ID.eq(freelancer.id()));
   }
 
   // Looks like batch support is not yet available in jOOQ: https://github.com/jOOQ/jOOQ/issues/14874
