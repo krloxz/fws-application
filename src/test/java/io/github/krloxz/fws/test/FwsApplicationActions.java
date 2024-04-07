@@ -1,7 +1,5 @@
 package io.github.krloxz.fws.test;
 
-import java.util.List;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -33,12 +31,12 @@ public class FwsApplicationActions {
   }
 
   /**
-   * @param freelancers
-   *        DTO's representing the freelancers that will be affected by the invoked actions
+   * @param freelancer
+   *        DTO representing the freelancer that will be affected by the invoked actions
    * @return the {@link FreelancerActions}
    */
-  public FreelancerActions freelancers(final FreelancerDto... freelancers) {
-    return new FreelancerActions(List.of(freelancers), this);
+  public FreelancerActions freelancer(final FreelancerDto freelancer) {
+    return new FreelancerActions(freelancer, this);
   }
 
   /**

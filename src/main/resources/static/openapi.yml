@@ -240,12 +240,22 @@ components:
               $ref: "#/components/schemas/Link"
             changeAddress:
               $ref: "#/components/schemas/Link"
+            addCommunicationChannel:
+              $ref: "#/components/schemas/Link"
+            removeCommunicationChannel:
+              oneOf:
+                - $ref: "#/components/schemas/Link"
+                - type: array
+                  items:
+                    $ref: "#/components/schemas/Link"
       required:
-        - id
         - firstName
         - lastName
+        - birthDate
         - address
         - wage
+        - nicknames
+        - communicationChannels
         - _links
     Address:
       type: object
@@ -278,6 +288,10 @@ components:
     CommunicationChannel:
       type: object
       properties:
+        id:
+          type: string
+          description: Unique identifier for the communication channel
+          example: "c7e8f8e7-7f7e-4e7f-8e7f-7e7f8e7f7e7f"
         value:
           type: string
           description: Communication channel value (e.g., email address)

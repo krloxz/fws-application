@@ -4,14 +4,13 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.server.core.TypeReferences.EntityModelType;
 
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDtoBuilder;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
@@ -38,7 +37,8 @@ class FreelancersApiTest {
   void registersFreelancers() {
     this.fwsApplication.running()
         .when()
-        .freelancers(tonyStark(), steveRogers()).registered()
+        .freelancer(tonyStark()).registered()
+        .freelancer(steveRogers()).registered()
         .then()
         .freelancers()
         .expectStatus().isOk()
@@ -47,10 +47,26 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsValidationErrorWhenRegisteringFreelancersWithInvalidData() {
+  void providesBasicAffordancesWhenFreelancerRegistered() {
     this.fwsApplication.running()
         .when()
-        .freelancers(invalidFreelancer()).registered()
+        .freelancer(tonyStark()).registered()
+        .then()
+        .response()
+        .expectStatus().isCreated()
+        .expectBody()
+        .jsonPath("_links.collection.href").isNotEmpty()
+        .jsonPath("_links.self.href").isNotEmpty()
+        .jsonPath("_links.changeAddress.href").isNotEmpty()
+        .jsonPath("_links.addCommunicationChannel.href").isNotEmpty()
+        .jsonPath("_links.removeCommunicationChannel").value(hasSize(tonyStark().communicationChannels().size()));
+  }
+
+  @Test
+  void reportsValidationErrorWhenRegisteringFreelancerWithInvalidData() {
+    this.fwsApplication.running()
+        .when()
+        .freelancer(invalidFreelancer()).registered()
         .then()
         .response()
         .expectStatus().isBadRequest()
@@ -61,23 +77,11 @@ class FreelancersApiTest {
   }
 
   @Test
-  void retrievesRegisteredFreelancers() {
-    final var selfLink = this.fwsApplication.running()
+  void retrievesRegisteredFreelancer() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
         .when()
-        .freelancers(tonyStark()).registered()
-        .then()
-        .response()
-        .expectStatus().isCreated()
-        .expectBody(new EntityModelType<FreelancerDto>() {})
-        .returnResult()
-        .getResponseBody()
-        .getRequiredLink(IanaLinkRelations.SELF)
-        .getHref()
-        .split("/")[1];
-
-    this.fwsApplication.running()
-        .when()
-        .freelancers().retrieved(selfLink)
+        .freelancer(tonyStark()).retrieved()
         .then()
         .response()
         .expectStatus().isOk()
@@ -86,10 +90,10 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundErrorWhenRetrievingUnregisteredFreelancers() {
+  void reportsNotFoundErrorWhenRetrievingUnregisteredFreelancer() {
     this.fwsApplication.running()
         .when()
-        .freelancers().retrieved("UNREGISTERED")
+        .freelancer(unregistered()).retrieved()
         .then()
         .response()
         .expectStatus().isNotFound()
@@ -102,7 +106,7 @@ class FreelancersApiTest {
     this.fwsApplication.runningWith()
         .freelancers(tonyStark())
         .when()
-        .freelancers(tonyStark()).movesTo(steveRogers().address())
+        .freelancer(tonyStark()).movesTo(steveRogers().address())
         .then()
         .freelancers()
         .expectBody()
@@ -116,10 +120,10 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundErrorWhenUpdatingAddressOfUnregisteredFreelancers() {
+  void reportsNotFoundErrorWhenUpdatingAddressOfUnregisteredFreelancer() {
     this.fwsApplication.running()
         .when()
-        .freelancers(tonyStark()).movesTo(steveRogers().address())
+        .freelancer(unregistered()).movesTo(steveRogers().address())
         .then()
         .response()
         .expectStatus().isNotFound()
@@ -132,7 +136,7 @@ class FreelancersApiTest {
     this.fwsApplication.runningWith()
         .freelancers(tonyStark())
         .when()
-        .freelancers(tonyStark()).addsCommunicationChannel(mobile("901-234-8765"))
+        .freelancer(tonyStark()).addsCommunicationChannel(mobile("901-234-8765"))
         .then()
         .freelancers()
         .expectBody()
@@ -142,10 +146,22 @@ class FreelancersApiTest {
   }
 
   @Test
+  void providesAffordancesToRemoveRegisteredCommunicationChannel() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
+        .when()
+        .freelancer(tonyStark()).addsCommunicationChannel(mobile("901-234-8765"))
+        .then()
+        .response()
+        .expectBody()
+        .jsonPath("_links.removeCommunicationChannel").value(hasSize(tonyStark().communicationChannels().size() + 1));
+  }
+
+  @Test
   void reportsNotFoundWhenAddingCommunicationChannelToUnregisteredFreelancer() {
     this.fwsApplication.runningWith()
         .when()
-        .freelancers(unregisteredFreelancer()).addsCommunicationChannel(mobile("901-234-8765"))
+        .freelancer(unregistered()).addsCommunicationChannel(mobile("901-234-8765"))
         .then()
         .response()
         .expectStatus().isNotFound()
@@ -196,7 +212,7 @@ class FreelancersApiTest {
         .build();
   }
 
-  private static FreelancerDto unregisteredFreelancer() {
+  private static FreelancerDto unregistered() {
     return new FreelancerDtoBuilder().id("UNREGISTERED").build();
   }
 

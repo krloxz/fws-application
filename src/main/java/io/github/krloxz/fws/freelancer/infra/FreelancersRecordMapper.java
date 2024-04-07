@@ -6,6 +6,7 @@ import static io.github.krloxz.fws.infra.jooq.Tables.FREELANCERS;
 import static java.util.stream.Collectors.joining;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,7 +54,10 @@ abstract class FreelancersRecordMapper {
   public Freelancer fromRecords(final List<Record> records) {
     final var freelancersRecord = records.get(0).into(FREELANCERS);
     final var addressesRecord = records.get(0).into(ADDRESSES);
-    final var channelsRecords = records.stream().map(record -> record.into(COMMUNICATION_CHANNELS)).toList();
+    final var channelsRecords = records.stream()
+        .map(record -> record.into(COMMUNICATION_CHANNELS))
+        .filter(record -> Objects.nonNull(record.getId()))
+        .toList();
     return fromRecords(freelancersRecord, addressesRecord, channelsRecords);
   }
 

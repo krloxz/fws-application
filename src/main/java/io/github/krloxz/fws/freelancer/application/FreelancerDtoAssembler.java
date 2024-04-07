@@ -39,6 +39,17 @@ class FreelancerDtoAssembler
             linkTo(method().changeAddress(dto.id().orElse(""), null), exchange)
                 .withRel(AffordanceLink.AFFORDANCE_REL)
                 .toMono(AffordanceLink::new))
+        .concatWith(
+            linkTo(method().addCommunicationChannel(dto.id().orElse(""), null), exchange)
+                .withRel(AffordanceLink.AFFORDANCE_REL)
+                .toMono(AffordanceLink::new))
+        .concatWith(
+            Flux.fromIterable(dto.communicationChannels())
+                .flatMap(
+                    channel -> linkTo(method()
+                        .removeCommunicationChannel(dto.id().orElse(""), channel.id().orElse("")), exchange)
+                            .withRel(AffordanceLink.AFFORDANCE_REL)
+                            .toMono(AffordanceLink::new)))
         .collectList()
         .map(links -> EntityModel.of(dto, links));
   }

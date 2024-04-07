@@ -13,13 +13,13 @@ CREATE TABLE IF NOT EXISTS freelancer.freelancers(
 );
 
 CREATE TABLE IF NOT EXISTS freelancer.addresses(
-  freelancer_id UUID NOT NULL,
   street TEXT NOT NULL,
   apartment TEXT,
   city TEXT NOT NULL,
   state TEXT NOT NULL,
   country TEXT NOT NULL,
   zip_code TEXT NOT NULL,
+  freelancer_id UUID NOT NULL,
   
   CONSTRAINT address_freelancer_fk
     FOREIGN KEY (freelancer_id)
@@ -28,9 +28,10 @@ CREATE TABLE IF NOT EXISTS freelancer.addresses(
 );
 
 CREATE TABLE IF NOT EXISTS freelancer.communication_channels(
-  freelancer_id UUID NOT NULL,
+  id UUID PRIMARY KEY,
   value_ TEXT NOT NULL,
   type TEXT NOT NULL,
+  freelancer_id UUID NOT NULL,
   
   CONSTRAINT communication_channel_freelancer_fk
     FOREIGN KEY (freelancer_id)

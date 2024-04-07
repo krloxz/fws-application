@@ -47,4 +47,13 @@ abstract class FreelancerDtoMapper {
     return Optional.of(id.value().toString());
   }
 
+  UUID toUUID(final Optional<String> value) {
+    return value.map(UUID::fromString)
+        .orElse(UUID.randomUUID());
+  }
+
+  Optional<String> toOptionalString(final UUID value) {
+    return Optional.of(value.toString());
+  }
+
 }

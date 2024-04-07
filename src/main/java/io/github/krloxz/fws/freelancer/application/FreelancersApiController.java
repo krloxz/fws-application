@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -118,6 +119,13 @@ public class FreelancersApiController {
         .map(freelancer -> freelancer.add(this.mapper.fromDto(channel)))
         .flatMap(this.repository::update)
         .map(this.mapper::toDto);
+  }
+
+  @DeleteMapping("/{id}/communication-channels/{channelId}")
+  public Mono<FreelancerDto> removeCommunicationChannel(
+      @PathVariable final String id,
+      @PathVariable final String channelId) {
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   private Mono<Freelancer> findById(final String id) {
