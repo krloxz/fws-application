@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS freelancer.freelancers(
   middle_name TEXT,
   gender TEXT,
   birth_date DATE,
-  hourly_wage_value NUMERIC(9,2) NOT NULL,
+  hourly_wage_amount NUMERIC(9,2) NOT NULL,
   hourly_wage_currency TEXT NOT NULL,
   nicknames TEXT NOT NULL
 );

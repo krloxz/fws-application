@@ -10,9 +10,11 @@ import org.mapstruct.Mapping;
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 import io.github.krloxz.fws.freelancer.domain.Address;
 import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
+import io.github.krloxz.fws.freelancer.domain.HourlyWage;
 
 /**
  * Maps {@link Freelancer}'s between the DTO and domain models.
@@ -35,6 +37,8 @@ abstract class FreelancerDtoMapper {
   public abstract Address fromDto(AddressDto dto);
 
   public abstract CommunicationChannel fromDto(CommunicationChannelDto dto);
+
+  public abstract HourlyWage fromDto(HourlyWageDto dto);
 
   UUID toUUID(final Optional<String> value) {
     return value.map(UUID::fromString)

@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
 import reactor.core.publisher.Flux;
@@ -110,6 +111,25 @@ public class FreelancersApiController {
       @RequestBody final String[] nicknames) {
     return findById(id)
         .map(freelancer -> freelancer.withNicknames(nicknames))
+        .flatMap(this.repository::update)
+        .map(this.mapper::toDto);
+  }
+
+  /**
+   * Updates the hourly wage of the freelancer identified by the given identifier.
+   *
+   * @param id
+   *        freelancer identifier
+   * @param wage
+   *        new hourly wage
+   * @return a {@link Mono} that emits the updated freelancer's data
+   */
+  @PatchMapping("/{id}/wage")
+  public Mono<FreelancerDto> updateWage(
+      @PathVariable final String id,
+      @Validated @RequestBody final HourlyWageDto wage) {
+    return findById(id)
+        .map(freelancer -> freelancer.withHourlyWage(this.mapper.fromDto(wage)))
         .flatMap(this.repository::update)
         .map(this.mapper::toDto);
   }

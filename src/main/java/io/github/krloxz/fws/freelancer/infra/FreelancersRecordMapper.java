@@ -35,7 +35,7 @@ abstract class FreelancersRecordMapper {
   @Mapping(target = "firstName", source = "name.first")
   @Mapping(target = "lastName", source = "name.last")
   @Mapping(target = "middleName", source = "name.middle")
-  @Mapping(target = "hourlyWageValue", source = "wage.value")
+  @Mapping(target = "hourlyWageAmount", source = "wage.amount")
   @Mapping(target = "hourlyWageCurrency", source = "wage.currency")
   public abstract FreelancersRecord toFreelancersRecord(Freelancer freelancer);
 
@@ -79,7 +79,7 @@ abstract class FreelancersRecordMapper {
   @Mapping(target = "name.first", source = "freelancersRecord.firstName")
   @Mapping(target = "name.last", source = "freelancersRecord.lastName")
   @Mapping(target = "name.middle", source = "freelancersRecord.middleName")
-  @Mapping(target = "wage.value", source = "freelancersRecord.hourlyWageValue")
+  @Mapping(target = "wage.amount", source = "freelancersRecord.hourlyWageAmount")
   @Mapping(target = "wage.currency", source = "freelancersRecord.hourlyWageCurrency")
   @Mapping(target = "address", source = "addressesRecord")
   @Mapping(target = "communicationChannels", source = "channelsRecords")

@@ -8,13 +8,13 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface HourlyWage {
 
-  BigDecimal value();
+  BigDecimal amount();
 
   Currency currency();
 
   static HourlyWage of(final BigDecimal value, final String currency) {
     return ImmutableHourlyWage.builder()
-        .value(value)
+        .amount(value)
         .currency(Currency.getInstance(currency))
         .build();
   }

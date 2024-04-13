@@ -98,6 +98,20 @@ public abstract class Freelancer {
   }
 
   /**
+   * Updates the hourly wage of this freelancer.
+   *
+   * @param wage
+   *        the new hourly wage
+   * @return a copy of this freelancer with the given hourly wage
+   */
+  public Freelancer withHourlyWage(final HourlyWage wage) {
+    return Freelancer.builder()
+        .from(this)
+        .wage(wage)
+        .build();
+  }
+
+  /**
    * Adds a new communication channel to this freelancer.
    *
    * @param channel
@@ -131,20 +145,6 @@ public abstract class Freelancer {
             .from(this)
             .communicationChannels(newChannels)
             .build());
-  }
-
-  /**
-   * Updates the hourly wage of this freelancer.
-   *
-   * @param wage
-   *        the new hourly wage
-   * @return a new instance of freelancer with the updated hourly wage
-   */
-  public Freelancer update(final HourlyWage wage) {
-    return Freelancer.builder()
-        .from(this)
-        .wage(wage)
-        .build();
   }
 
 }

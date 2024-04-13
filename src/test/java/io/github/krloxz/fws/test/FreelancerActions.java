@@ -6,6 +6,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
+import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 
 /**
  * Actions to invoke the Freelancers API.
@@ -87,6 +88,23 @@ public class FreelancerActions {
             .uri("/freelancers/" + freelancerId() + "/nicknames")
             .accept(MediaTypes.HAL_JSON)
             .bodyValue(nicknames)
+            .exchange());
+    return this.applicationActions;
+  }
+
+  /**
+   * Registers an action to invoke the endpoint that updates the hourly wage of a freelancer.
+   *
+   * @param wage
+   *        the new hourly wage
+   * @return the {@link FwsApplicationActions}
+   */
+  public FwsApplicationActions updatesWage(final HourlyWageDto wage) {
+    this.actionRecorder.add(
+        () -> this.webClient.patch()
+            .uri("/freelancers/" + freelancerId() + "/wage")
+            .accept(MediaTypes.HAL_JSON)
+            .bodyValue(wage)
             .exchange());
     return this.applicationActions;
   }

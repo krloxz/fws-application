@@ -14,7 +14,7 @@ import jakarta.validation.constraints.PositiveOrZero;
  * @author Carlos Gomez
  */
 public record HourlyWageDto(
-    @NotNull @PositiveOrZero @Digits(integer = 7, fraction = 2) BigDecimal value,
+    @NotNull @PositiveOrZero @Digits(integer = 7, fraction = 2) BigDecimal amount,
     @NotBlank String currency) {
 
 }

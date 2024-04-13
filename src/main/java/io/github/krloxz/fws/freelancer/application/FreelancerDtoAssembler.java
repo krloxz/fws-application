@@ -44,6 +44,10 @@ class FreelancerDtoAssembler
                 .withRel(AffordanceLink.AFFORDANCE_REL)
                 .toMono(AffordanceLink::new))
         .concatWith(
+            linkTo(method().updateWage(dto.id().orElse(""), null), exchange)
+                .withRel(AffordanceLink.AFFORDANCE_REL)
+                .toMono(AffordanceLink::new))
+        .concatWith(
             linkTo(method().addCommunicationChannel(dto.id().orElse(""), null), exchange)
                 .withRel(AffordanceLink.AFFORDANCE_REL)
                 .toMono(AffordanceLink::new))

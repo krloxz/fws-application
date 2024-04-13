@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -63,6 +64,7 @@ class FreelancersApiTest {
         .jsonPath("_links.self.href").isNotEmpty()
         .jsonPath("_links.changeAddress.href").isNotEmpty()
         .jsonPath("_links.updateNicknames.href").isNotEmpty()
+        .jsonPath("_links.updateWage.href").isNotEmpty()
         .jsonPath("_links.addCommunicationChannel.href").isNotEmpty()
         .jsonPath("_links.removeCommunicationChannel").value(hasSize(tonyStark().communicationChannels().size()));
   }
@@ -247,6 +249,31 @@ class FreelancersApiTest {
     this.fwsApplication.running()
         .when()
         .freelancer(unregistered()).updatesNicknames("Ironman", "Tony")
+        .then()
+        .response()
+        .expectStatus().isNotFound()
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
+  }
+
+  @Test
+  void updatesFreelancerWhenUpdatingWage() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
+        .when()
+        .freelancer(tonyStark()).updatesWage(new HourlyWageDto(new BigDecimal("1000000"), "USD"))
+        .then()
+        .freelancers()
+        .expectBody()
+        .jsonPath("_embedded.freelancers[0].wage.amount").value(is(closeTo(1_000_000, 0)))
+        .jsonPath("_embedded.freelancers[0].wage.currency").isEqualTo("USD");
+  }
+
+  @Test
+  void reportsNotFoundWhenUpdatingWageOfUnregisteredFreelancer() {
+    this.fwsApplication.running()
+        .when()
+        .freelancer(unregistered()).updatesWage(new HourlyWageDto(new BigDecimal("1000000"), "USD"))
         .then()
         .response()
         .expectStatus().isNotFound()

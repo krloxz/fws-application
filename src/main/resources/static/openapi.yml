@@ -165,6 +165,33 @@ paths:
                 $ref: "#/components/schemas/Freelancer"
         default:
           $ref: "#/components/responses/Error"
+  /freelancers/{id}/wage:
+    patch:
+      tags:
+        - Freelancers
+      description: Updates the wage of a registered freelancer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a freelancer already registered.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Wage"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+        default:
+          $ref: "#/components/responses/Error"
   /freelancers/{id}/communication-channels:
     post:
       tags:
@@ -257,21 +284,7 @@ components:
         address:
           $ref: "#/components/schemas/Address"
         wage:
-          type: object
-          description: Wage information of the freelancer
-          required:
-            - value
-            - currency
-          properties:
-            value:
-              type: number
-              format: float
-              description: Wage value
-              example: 5000000.00
-            currency:
-              type: string
-              description: Wage currency
-              example: "USD"
+          $ref: "#/components/schemas/Wage"
         nicknames:
           type: array
           description: List of nicknames for the freelancer
@@ -298,6 +311,8 @@ components:
               $ref: "#/components/schemas/Link"
             updateNicknames:
               $ref: "#/components/schemas/Link"
+            updateWage:
+              $ref: "#/components/schemas/Link"
             addCommunicationChannel:
               $ref: "#/components/schemas/Link"
             removeCommunicationChannel:
@@ -317,6 +332,7 @@ components:
         - _links
     Address:
       type: object
+      description: Address information
       properties:
         street:
           type: string
@@ -343,6 +359,22 @@ components:
         - state
         - zipCode
         - country
+    Wage:
+      type: object
+      description: Wage information
+      properties:
+        amount:
+          type: number
+          format: float
+          description: Wage amount
+          example: 5000000.00
+        currency:
+          type: string
+          description: Wage currency
+          example: "USD"
+      required:
+        - amount
+        - currency
     CommunicationChannel:
       type: object
       properties:
