@@ -136,6 +136,35 @@ paths:
                 $ref: "#/components/schemas/Freelancer"
         default:
           $ref: "#/components/responses/Error"
+  /freelancers/{id}/nicknames:
+    patch:
+      tags:
+        - Freelancers
+      description: Updates the nicknames of a registered freelancer.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a freelancer already registered.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Freelancer"
+        default:
+          $ref: "#/components/responses/Error"
   /freelancers/{id}/communication-channels:
     post:
       tags:
@@ -266,6 +295,8 @@ components:
             self:
               $ref: "#/components/schemas/Link"
             changeAddress:
+              $ref: "#/components/schemas/Link"
+            updateNicknames:
               $ref: "#/components/schemas/Link"
             addCommunicationChannel:
               $ref: "#/components/schemas/Link"

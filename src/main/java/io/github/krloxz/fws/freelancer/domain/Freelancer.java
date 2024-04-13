@@ -70,11 +70,11 @@ public abstract class Freelancer {
   }
 
   /**
-   * Creates a new instance of freelancer class with the given address.
+   * Updates the address of this freelancer.
    *
    * @param newAddress
    *        the new address
-   * @return a new instance of freelancer class with the given address
+   * @return a copy of this freelancer with the new address
    */
   public Freelancer movedTo(final Address newAddress) {
     return Freelancer.builder()
@@ -84,16 +84,16 @@ public abstract class Freelancer {
   }
 
   /**
-   * Adds a new nickname to this freelancer.
+   * Updates the nicknames of this freelancer.
    *
-   * @param nickName
-   *        the new nickname
-   * @return a new instance of freelancer with the added nickname
+   * @param nicknames
+   *        the new nicknames
+   * @return a copy of this freelancer with the given nicknames
    */
-  public Freelancer add(final String nickName) {
+  public Freelancer withNicknames(final String... nicknames) {
     return Freelancer.builder()
         .from(this)
-        .addNicknames(nickName)
+        .nicknames(Set.of(nicknames))
         .build();
   }
 
@@ -102,27 +102,12 @@ public abstract class Freelancer {
    *
    * @param channel
    *        the new communication channel
-   * @return a new instance of freelancer with the added communication channel
+   * @return a copy of this freelancer with the new communication channel
    */
-  public Freelancer add(final CommunicationChannel channel) {
+  public Freelancer addCommunicationChannel(final CommunicationChannel channel) {
     return Freelancer.builder()
         .from(this)
         .addCommunicationChannels(channel)
-        .build();
-  }
-
-  /**
-   * Removes a nickname from this freelancer.
-   *
-   * @param nickName
-   *        the nickname to be removed
-   * @return a new instance of freelancer with the nickname removed
-   */
-  public Freelancer remove(final String nickName) {
-    final var newNicknames = nicknames().stream().filter(nick -> !nick.equals(nickName)).toList();
-    return Freelancer.builder()
-        .from(this)
-        .nicknames(newNicknames)
         .build();
   }
 
@@ -131,8 +116,8 @@ public abstract class Freelancer {
    *
    * @param id
    *        the identifier of the communication channel to be removed
-   * @return an {@link Optional} with a new instance of freelancer with the communication channel
-   *         removed when the channel was found, an empty {@link Optional} otherwise
+   * @return an {@link Optional} with a copy of this freelancer with the communication channel removed
+   *         when the channel was found, an empty {@link Optional} otherwise
    */
   public Optional<Freelancer> removeCommunicationChannel(final UUID id) {
     final var newChannels = communicationChannels().stream()

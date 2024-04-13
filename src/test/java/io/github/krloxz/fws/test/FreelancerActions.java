@@ -75,6 +75,23 @@ public class FreelancerActions {
   }
 
   /**
+   * Registers an action to invoke the endpoint that updates the nicknames of a freelancer.
+   *
+   * @param nicknames
+   *        the new nicknames
+   * @return the {@link FwsApplicationActions}
+   */
+  public FwsApplicationActions updatesNicknames(final String... nicknames) {
+    this.actionRecorder.add(
+        () -> this.webClient.patch()
+            .uri("/freelancers/" + freelancerId() + "/nicknames")
+            .accept(MediaTypes.HAL_JSON)
+            .bodyValue(nicknames)
+            .exchange());
+    return this.applicationActions;
+  }
+
+  /**
    * Registers an action to invoke the endpoint that adds a communication channel.
    *
    * @param channel

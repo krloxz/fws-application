@@ -62,6 +62,7 @@ class FreelancersApiTest {
         .jsonPath("_links.collection.href").isNotEmpty()
         .jsonPath("_links.self.href").isNotEmpty()
         .jsonPath("_links.changeAddress.href").isNotEmpty()
+        .jsonPath("_links.updateNicknames.href").isNotEmpty()
         .jsonPath("_links.addCommunicationChannel.href").isNotEmpty()
         .jsonPath("_links.removeCommunicationChannel").value(hasSize(tonyStark().communicationChannels().size()));
   }
@@ -225,6 +226,30 @@ class FreelancersApiTest {
         .then()
         .response()
         .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+        .expectBody()
+        .jsonPath("type").isEqualTo("/probs/error.html");
+  }
+
+  @Test
+  void updatesFreelancerWhenUpdatingNicknames() {
+    this.fwsApplication.runningWith()
+        .freelancers(tonyStark())
+        .when()
+        .freelancer(tonyStark()).updatesNicknames("Ironman", "Tony", "Mr. Stark")
+        .then()
+        .freelancers()
+        .expectBody()
+        .jsonPath("_embedded.freelancers[0].nicknames").value(hasItems("Ironman", "Tony", "Mr. Stark"));
+  }
+
+  @Test
+  void reportsNotFoundWhenUpdatingNicknamesOfUnregisteredFreelancer() {
+    this.fwsApplication.running()
+        .when()
+        .freelancer(unregistered()).updatesNicknames("Ironman", "Tony")
+        .then()
+        .response()
+        .expectStatus().isNotFound()
         .expectBody()
         .jsonPath("type").isEqualTo("/probs/error.html");
   }

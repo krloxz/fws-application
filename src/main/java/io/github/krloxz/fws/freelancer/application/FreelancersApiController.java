@@ -96,6 +96,25 @@ public class FreelancersApiController {
   }
 
   /**
+   * Updates the nicknames of the freelancer identified by the given identifier.
+   *
+   * @param id
+   *        freelancer identifier
+   * @param nicknames
+   *        new nicknames
+   * @return a {@link Mono} that emits the updated freelancer's data
+   */
+  @PatchMapping("/{id}/nicknames")
+  public Mono<FreelancerDto> updateNicknames(
+      @PathVariable final String id,
+      @RequestBody final String[] nicknames) {
+    return findById(id)
+        .map(freelancer -> freelancer.withNicknames(nicknames))
+        .flatMap(this.repository::update)
+        .map(this.mapper::toDto);
+  }
+
+  /**
    * Adds a new communication channel to the freelancer identified by the given identifier.
    *
    * @param id
@@ -117,7 +136,7 @@ public class FreelancersApiController {
       @PathVariable final String id,
       @Validated @RequestBody final CommunicationChannelDto channel) {
     return findById(id)
-        .map(freelancer -> freelancer.add(this.mapper.fromDto(channel)))
+        .map(freelancer -> freelancer.addCommunicationChannel(this.mapper.fromDto(channel)))
         .flatMap(this.repository::update)
         .map(this.mapper::toDto);
   }
