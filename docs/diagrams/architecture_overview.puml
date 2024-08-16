@@ -1,0 +1,66 @@
+@startuml
+!define SYSTEM rectangle
+!define BOUNDED_CONTEXT package
+!define LAYER package
+!define COMPONENT rectangle
+!define SCHEMA file
+
+title Architecture Overview
+
+COMPONENT Client
+INTERFACE "RESTful API" as RESTAPI
+SYSTEM "External System" as ExternalSystem
+
+SYSTEM System {
+  BOUNDED_CONTEXT "Bounded Context A" {
+    LAYER "Application Layer" as ApplicationLayerA {
+      COMPONENT "API Controllers" as ApiControllersA
+    }
+    LAYER "Domain Layer" as DomainLayerA {
+      COMPONENT "Domain Model" as DomainModelA
+    }
+    LAYER "Infrastructure Layer" as InfrastructureLayerA {
+      COMPONENT "Anticorruption Layer" as AnticorruptionLayerA
+    }
+  }
+
+  BOUNDED_CONTEXT "Bounded Context B" {
+    LAYER "Application Layer" as ApplicationLayerB {
+      COMPONENT "API Controllers" as ApiControllersB
+    }
+    LAYER "Domain Layer" as DomainLayerB {
+      COMPONENT "Domain Model" as DomainModelB
+    }
+    LAYER "Infrastructure Layer" as InfrastructureLayerB {
+      COMPONENT "Anticorruption Layer" as AnticorruptionLayerB
+    }
+  }
+
+  port " " as port
+  DATABASE Database {
+    SCHEMA "Schema A\n\n" as SchemaA
+    SCHEMA "Schema B\n\n" as SchemaB
+  }
+}
+
+
+' Internal interactions
+ApiControllersA -u- port
+ApiControllersA ..> DomainModelA : "Uses"
+ApiControllersA .> InfrastructureLayerA : "Uses"
+InfrastructureLayerA .u.|> DomainModelA : "Implements"
+InfrastructureLayerA ..> SchemaA : "Uses"
+AnticorruptionLayerA .r.> ApiControllersB : "Uses"
+
+ApiControllersB -u- port
+ApiControllersB ..> DomainModelB : "Uses"
+ApiControllersB .> InfrastructureLayerB : "Uses"
+InfrastructureLayerB .u.|> DomainModelB : "Implements"
+InfrastructureLayerB ..> SchemaB : "Uses"
+AnticorruptionLayerB ..> ExternalSystem : "Uses"
+
+' External interactions
+Client ..> RESTAPI : "Uses"
+RESTAPI -- port
+
+@enduml

@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/linux,gradle,java,eclipse
-# Edit at https://www.toptal.com/developers/gitignore?templates=linux,gradle,java,eclipse
+# Created by https://www.toptal.com/developers/gitignore/api/java,linux,gradle,eclipse,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=java,linux,gradle,eclipse,visualstudiocode
 
 ### Eclipse ###
 .metadata
@@ -108,6 +108,25 @@ replay_pid*
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
+
 ### Gradle ###
 .gradle
 **/build/
@@ -135,4 +154,4 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-# End of https://www.toptal.com/developers/gitignore/api/linux,gradle,java,eclipse
+# End of https://www.toptal.com/developers/gitignore/api/java,linux,gradle,eclipse,visualstudiocode

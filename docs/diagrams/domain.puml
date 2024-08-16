@@ -1,0 +1,34 @@
+@startuml
+
+title Freelancer Web Services Domain
+skinparam {
+  packageStyle rectangle
+}
+
+package "Freelancer Web Services" <<Domain>> {
+
+  package "Freelancer Management" <<Subdomain>> {
+    artifact "Freelancer Context" <<Bounded Context>>
+  }
+
+  package "Project Management" <<Subdomain>> {
+    artifact "Project Context" <<Bounded Context>>
+  }
+
+  package "Customer Management" <<Subdomain>> {
+    artifact "Customer Context" <<Bounded Context>>
+  }
+
+  package "Billing Management" <<Subdomain>> {
+    artifact "Billing Context" <<Bounded Context>>
+  }
+
+}
+
+"Freelancer Context" -l- "Project Context"
+"Project Context" -r- "Customer Context"
+"Billing Context" -u- "Freelancer Context"
+"Billing Context" -u- "Project Context"
+"Billing Context" -u- "Customer Context"
+
+@enduml

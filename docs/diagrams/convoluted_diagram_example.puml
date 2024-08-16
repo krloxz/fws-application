@@ -1,0 +1,165 @@
+@startuml
+
+title Body Leasing Domain
+hide empty members
+hide circle
+caption Based on https://www.mirkosertic.de/blog/2013/04/domain-driven-design-example/
+
+skinparam {
+  shadowing true
+  packageStyle rectangle
+}
+
+package "Project Management" <<Bounded Context>> {
+
+  class Project <<aggregate root>> {
+    name
+  }
+
+  class ProjectId <<value object>> {
+    value
+  }
+
+}
+
+package "Customer Management" <<Bounded Context>> {
+
+  class Customer <<aggregate root>> {
+    name
+  }
+
+  class CustomerId <<value object>> {
+    value
+  }
+}
+
+package "Freelancer Management" <<Bounded Context>> {
+
+
+  class Freelancer <<aggregate root>> {
+    - nickNames
+    ---
+    + movedTo(newAddress)
+    + add(nickName)
+    + add(communicationChannel)
+    + remove(nickName)
+    + remove(communicationChannel)
+    + update(hourlyWage)
+  }
+
+  class FreelancerId <<value object>> {
+    value
+  }
+
+  class PersonName <<value object>> {
+    first
+    last
+    middle
+  }
+
+  class Address <<entity>> {
+    id
+    label
+    street
+    city
+    state
+    zip code
+  }
+
+  class CommunicationChannel <<value object>> {
+    value
+    type : MOBILE, PHONE, EMAIL or URL
+  }
+
+  class HourlyWage <<value object>> {
+    value : BigDecimal
+    currency
+  }
+
+  class HourlyWageUpdated <<event>> {
+
+  }
+
+
+  class Timesheet <<aggregate root>> {
+    start date
+    end date
+    ---
+    {static} of(FreelancerId, currentProjects, currentWage)
+    add(TimesheetEntry)
+    update(TimesheetEntry)
+    remove(TimesheetEntry)
+    submit()
+    accept()
+    billed()
+    return(reason)
+    reject(reason)
+    cancel(reason)
+    totalWorkedTime()
+    grossWages()
+  }
+
+  class TimesheetId <<value object>> {
+    value
+  }
+
+  class TimesheetEntry <<entity>> {
+    id
+    date
+    task description
+    worked time
+  }
+
+  enum TimesheetStatus <<enumeration>> {
+    OPEN
+    SUBMITTED
+    ACCEPTED
+    BILLED
+    RETURNED
+    REJECTED
+    CANCELLED
+  }
+
+  class TimesheetRepository <<repository>> {
+    save(timesheet)
+    findAllBy(freelancerId)
+    findAllBy(freelancerIdAndTimeFrame)
+    findAllBy(projectId)
+  }
+
+  class Services <<service>> {
+    projectCost(projectId)
+    projectDuration(projectId)
+    freelancerWages(freelancerId, timeFrame)
+    freelancerWagesByProject(freelancerId, projectId)
+    freelancerWorkedTime(freelancerId, timeFrame)
+    freelancerworkedTimeByProject(freelancerId, projectId)
+  }
+
+}
+
+package "Billing Management" <<Bounded Context>> {
+}
+
+Freelancer *--> FreelancerId : id
+Freelancer *--> PersonName : name
+Freelancer *--> Address : 1..*\naddresses
+Freelancer *--> CommunicationChannel : 1..*\ncommunication channels
+Freelancer o--> ProjectId : 0..*\nassigned projects
+Freelancer *--> HourlyWage : wage
+
+Timesheet *--> TimesheetId : id
+Timesheet *--> TimesheetStatus : status
+Timesheet *--> FreelancerId : freelancer
+Timesheet o--> TimesheetEntry : 0..*\nentries
+Timesheet *--> ProjectId : project
+Timesheet *--> HourlyWage : current wage
+TimesheetEntry *--> ProjectId : project
+TimesheetRepository ..> Timesheet : <<stores>>
+
+Project *--> ProjectId : id
+Project *--> CustomerId : customer
+
+Customer *--> CustomerId : id
+
+@enduml
