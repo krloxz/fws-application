@@ -42,7 +42,7 @@ paths:
     get:
       tags:
         - Freelancers
-      description: Lists a page of freelancers already registered on the system.
+      description: Returns a paginated list of freelancers.
       parameters:
         - in: query
           name: page
@@ -134,7 +134,7 @@ paths:
     get:
       tags:
         - Freelancers
-      description: Retrieves a registered freelancer by ID.
+      description: Retrieves a freelancer by its ID.
       parameters:
         - in: path
           name: id

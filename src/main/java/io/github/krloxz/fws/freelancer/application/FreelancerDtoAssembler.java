@@ -39,7 +39,7 @@ public class FreelancerDtoAssembler
         .withRel(IanaLinkRelations.COLLECTION)
         .toMono(AffordanceLink::new)
         .concatWith(
-            linkTo(method().getOne(dto.id().orElse("")), exchange)
+            linkTo(method().get(dto.id().orElse("")), exchange)
                 .withSelfRel()
                 .toMono(AffordanceLink::new))
         .concatWith(

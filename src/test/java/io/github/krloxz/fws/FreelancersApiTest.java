@@ -52,7 +52,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void providesBasicAffordancesWhenFreelancerRegistered() {
+  void returnsAffordancesWhenRegisteringFreelancers() {
     this.fwsApplication.running()
         .when()
         .freelancer(tonyStark()).registered()
@@ -70,7 +70,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsValidationErrorWhenRegisteringFreelancerWithInvalidData() {
+  void failsToRegisterFreelancerWithInvalidData() {
     this.fwsApplication.running()
         .when()
         .freelancer(invalidFreelancer()).registered()
@@ -97,7 +97,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundErrorWhenRetrievingUnregisteredFreelancer() {
+  void returnsNotFoundWhenRetrievingUnregisteredFreelancer() {
     this.fwsApplication.running()
         .when()
         .freelancer(unregistered()).retrieved()
@@ -127,7 +127,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundErrorWhenUpdatingAddressOfUnregisteredFreelancer() {
+  void returnsNotFoundWhenUpdatingAddressOfUnregisteredFreelancer() {
     this.fwsApplication.running()
         .when()
         .freelancer(unregistered()).movesTo(steveRogers().address())
@@ -153,7 +153,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void providesAffordancesToRemoveRegisteredCommunicationChannel() {
+  void returnsAffordancesToRemoveRegisteredCommunicationChannel() {
     this.fwsApplication.runningWith()
         .freelancers(tonyStark())
         .when()
@@ -165,7 +165,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundWhenAddingCommunicationChannelToUnregisteredFreelancer() {
+  void returnsNotFoundWhenAddingCommunicationChannelToUnregisteredFreelancer() {
     this.fwsApplication.runningWith()
         .when()
         .freelancer(unregistered()).addsCommunicationChannel(mobile("901-234-8765"))
@@ -208,7 +208,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundWhenRemovingCommunicationChannelFromUnregisteredFreelancer() {
+  void returnsNotFoundWhenRemovingCommunicationChannelFromUnregisteredFreelancer() {
     this.fwsApplication.runningWith()
         .when()
         .freelancer(unregistered()).removesCommunicationChannel(UUID.randomUUID().toString())
@@ -220,7 +220,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsUnprocessableEntityWhenRemovingNonExistentCommunicationChannel() {
+  void returnsUnprocessableEntityWhenRemovingNonExistentCommunicationChannel() {
     this.fwsApplication.runningWith()
         .freelancers(tonyStark())
         .when()
@@ -245,7 +245,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundWhenUpdatingNicknamesOfUnregisteredFreelancer() {
+  void returnsNotFoundWhenUpdatingNicknamesOfUnregisteredFreelancer() {
     this.fwsApplication.running()
         .when()
         .freelancer(unregistered()).updatesNicknames("Ironman", "Tony")
@@ -270,7 +270,7 @@ class FreelancersApiTest {
   }
 
   @Test
-  void reportsNotFoundWhenUpdatingWageOfUnregisteredFreelancer() {
+  void returnsNotFoundWhenUpdatingWageOfUnregisteredFreelancer() {
     this.fwsApplication.running()
         .when()
         .freelancer(unregistered()).updatesWage(new HourlyWageDto(new BigDecimal("1000000"), "USD"))

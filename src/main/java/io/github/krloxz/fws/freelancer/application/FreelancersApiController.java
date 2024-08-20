@@ -48,13 +48,11 @@ public class FreelancersApiController {
   }
 
   /**
-   * Lists a page of freelancers registered on the system.
-   *
    * @param page
-   *        0-based page number to list
+   *        optional 0-based integer representing the page number, defaults to 0
    * @param size
-   *        number of elements per page
-   * @return a page of freelancers
+   *        optional integer representing the size of the page, defaults to 5
+   * @return a paginated list of freelancers
    */
   @GetMapping
   @Transactional(readOnly = true)
@@ -72,12 +70,14 @@ public class FreelancersApiController {
 
   /**
    * @param id
-   *        freelancer identifier
-   * @return the freelancer identified by the given identifier
+   *        a freelancer identifier
+   * @return the freelancer with the given ID
+   * @throws ResponseStatusException
+   *         404 - if the freelancer with the given ID does not exist
    */
   @GetMapping("/{id}")
   @Transactional(readOnly = true)
-  public Mono<FreelancerDto> getOne(@PathVariable final String id) {
+  public Mono<FreelancerDto> get(@PathVariable final String id) {
     return findById(id).map(this.mapper::toDto);
   }
 
@@ -102,6 +102,8 @@ public class FreelancersApiController {
    * @param newAddress
    *        new address data
    * @return a {@link Mono} that emits the updated freelancer's data
+   * @throws ResponseStatusException
+   *         404 - if the freelancer with the given ID does not exist
    */
   @PatchMapping("/{id}/address")
   public Mono<FreelancerDto> changeAddress(
@@ -121,6 +123,8 @@ public class FreelancersApiController {
    * @param nicknames
    *        new nicknames
    * @return a {@link Mono} that emits the updated freelancer's data
+   * @throws ResponseStatusException
+   *         404 - if the freelancer with the given ID does not exist
    */
   @PatchMapping("/{id}/nicknames")
   public Mono<FreelancerDto> updateNicknames(
@@ -140,6 +144,8 @@ public class FreelancersApiController {
    * @param wage
    *        new hourly wage
    * @return a {@link Mono} that emits the updated freelancer's data
+   * @throws ResponseStatusException
+   *         404 - if the freelancer with the given ID does not exist
    */
   @PatchMapping("/{id}/wage")
   public Mono<FreelancerDto> updateWage(
@@ -159,6 +165,8 @@ public class FreelancersApiController {
    * @param channel
    *        communication channel data
    * @return a {@link Mono} that emits the updated freelancer's data
+   * @throws ResponseStatusException
+   *         404 - if the freelancer with the given ID does not exist
    * @implNote This operation simulates that there is a business requirement or a technology
    *           constraint that prevents from managing the whole collection of communication channels
    *           at once. Therefore, this operation is modeled as the addition of a freelancer
@@ -186,6 +194,8 @@ public class FreelancersApiController {
    * @param channelId
    *        identifier of the communication channel to be removed
    * @return a {@link Mono} that emits the updated freelancer's data
+   * @throws ResponseStatusException
+   *         404 - if the freelancer with the given ID does not exist
    * @implNote This operation simulates that there is a business requirement or a technology
    *           constraint that prevents from managing the whole collection of communication channels
    *           at once. Therefore, this operation is modeled as the removal of a freelancer
