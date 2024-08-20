@@ -9,7 +9,7 @@ import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 
 /**
- * Actions to invoke the Freelancers API.
+ * Actions to invoke the Freelancers API on an individual freelancer.
  *
  * @author Carlos Gomez
  */

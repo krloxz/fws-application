@@ -1,7 +1,6 @@
 package io.github.krloxz.fws.test;
 
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -11,19 +10,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *
  * @author Carlos Gomez
  */
-public class DatabaseCleaner implements BeforeAllCallback, BeforeEachCallback {
+public class DatabaseCleaner implements BeforeEachCallback {
 
-  private boolean isFirstTest;
-
-  @Override
-  public void beforeAll(final ExtensionContext context) throws Exception {
-    this.isFirstTest = true;
-  }
+  private static boolean isFirstTest = true;
 
   @Override
   public void beforeEach(final ExtensionContext context) throws Exception {
-    if (this.isFirstTest) {
-      this.isFirstTest = false;
+    if (DatabaseCleaner.isFirstTest) {
+      DatabaseCleaner.isFirstTest = false;
     } else {
       final var flyway = SpringExtension.getApplicationContext(context).getBean(Flyway.class);
       flyway.clean();

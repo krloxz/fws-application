@@ -1,5 +1,7 @@
 package io.github.krloxz.fws.test;
 
+import java.util.stream.Stream;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.hateoas.MediaTypes;
@@ -36,17 +38,18 @@ public class FwsApplicationInitializers implements ApplicationContextAware {
   /**
    * Initializes the state of the FwsApplication by registering freelancers.
    *
-   * @param dto
-   *        the DTO representing the freelancer to register
+   * @param dtos
+   *        DTOs representing the freelancers to register
    * @return this instance to allow method chaining
    */
-  public FwsApplicationInitializers freelancers(final FreelancerDto dto) {
-    this.context.getBean(WebTestClient.class).post()
-        .uri("/freelancers")
-        .accept(MediaTypes.HAL_JSON)
-        .bodyValue(dto)
-        .exchange()
-        .expectBody(Void.class);
+  public FwsApplicationInitializers freelancers(final FreelancerDto... dtos) {
+    Stream.of(dtos).forEach(
+        dto -> this.context.getBean(WebTestClient.class).post()
+            .uri("/freelancers")
+            .accept(MediaTypes.HAL_JSON)
+            .bodyValue(dto)
+            .exchange()
+            .expectBody(Void.class));
     return this;
   }
 

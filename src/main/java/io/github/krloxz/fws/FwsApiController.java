@@ -3,6 +3,8 @@ package io.github.krloxz.fws;
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
+import java.util.Optional;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +35,7 @@ public class FwsApiController {
         .withSelfRel()
         .toMono(AffordanceLink::new)
         .concatWith(
-            linkTo(methodOn(FreelancersApiController.class).getAll(), exchange)
+            linkTo(methodOn(FreelancersApiController.class).list(Optional.of(0), Optional.of(5)), exchange)
                 .withRel("freelancers")
                 .toMono(AffordanceLink::new))
         .collectList()

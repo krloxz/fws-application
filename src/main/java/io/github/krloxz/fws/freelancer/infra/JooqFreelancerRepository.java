@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
+import io.github.krloxz.fws.freelancer.domain.PageSpec;
 import io.github.krloxz.fws.infra.jooq.tables.records.CommunicationChannelsRecord;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -68,9 +69,13 @@ class JooqFreelancerRepository implements FreelancerRepository {
   }
 
   @Override
-  public Flux<Freelancer> findAll() {
+  public Flux<Freelancer> findAllBy(final PageSpec pageSpec) {
     return Flux.from(
-        this.create.select(FREELANCERS.ID).from(FREELANCERS).orderBy(FREELANCERS.FIRST_NAME))
+        this.create.select(FREELANCERS.ID)
+            .from(FREELANCERS)
+            .orderBy(FREELANCERS.LAST_NAME)
+            .offset(pageSpec.number() * pageSpec.size())
+            .limit(pageSpec.size()))
         .<UUID>map(Record1::value1)
         .flatMap(this::findRecordById)
         .map(this.mapper::fromRecords);
@@ -81,6 +86,13 @@ class JooqFreelancerRepository implements FreelancerRepository {
     return findRecordById(id)
         .filter(not(List::isEmpty))
         .map(this.mapper::fromRecords);
+  }
+
+  @Override
+  public Mono<Integer> count() {
+    return Mono.from(
+        this.create.selectCount().from(FREELANCERS))
+        .map(Record1::value1);
   }
 
   private DeleteConditionStep<CommunicationChannelsRecord> deleteChannels(final Freelancer freelancer) {

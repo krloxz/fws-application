@@ -38,11 +38,13 @@ public interface FreelancerRepository {
   Mono<Freelancer> update(Freelancer freelancer);
 
   /**
-   * Finds all freelancers.
+   * Returns a page of freelancers meeting the criteria specified by the given {@link PageSpec}.
    *
-   * @return a {@link Flux} with all freelancers
+   * @param pageSpec
+   *        specification for the page to return
+   * @return a {@link Flux} with the requested page of freelancers
    */
-  Flux<Freelancer> findAll();
+  Flux<Freelancer> findAllBy(PageSpec pageSpec);
 
   /**
    * Finds a freelancer by its unique identifier.
@@ -52,5 +54,10 @@ public interface FreelancerRepository {
    * @return a {@link Mono} with the freelancer, if found
    */
   Mono<Freelancer> findById(UUID id);
+
+  /**
+   * @return a {@link Mono} with the count of freelancers in the repository
+   */
+  Mono<Integer> count();
 
 }

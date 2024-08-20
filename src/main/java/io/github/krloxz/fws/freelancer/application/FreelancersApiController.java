@@ -1,5 +1,6 @@
 package io.github.krloxz.fws.freelancer.application;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,9 +23,10 @@ import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
+import io.github.krloxz.fws.freelancer.application.dtos.PageDto;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
-import reactor.core.publisher.Flux;
+import io.github.krloxz.fws.freelancer.domain.PageSpec;
 import reactor.core.publisher.Mono;
 
 /**
@@ -45,12 +48,26 @@ public class FreelancersApiController {
   }
 
   /**
-   * @return all the freelancers registered on the system
+   * Lists a page of freelancers registered on the system.
+   *
+   * @param page
+   *        0-based page number to list
+   * @param size
+   *        number of elements per page
+   * @return a page of freelancers
    */
   @GetMapping
   @Transactional(readOnly = true)
-  public Flux<FreelancerDto> getAll() {
-    return this.repository.findAll().map(this.mapper::toDto);
+  public Mono<PageDto<FreelancerDto>> list(
+      @RequestParam final Optional<Integer> page,
+      @RequestParam final Optional<Integer> size) {
+    final var pageNumber = page.orElse(0);
+    final var pageSize = size.orElse(5);
+    return this.repository.findAllBy(new PageSpec(pageNumber, pageSize))
+        .map(this.mapper::toDto)
+        .collectList()
+        .zipWith(this.repository.count().cache())
+        .map(tuple -> new PageDto<>(tuple.getT1(), pageNumber, pageSize, tuple.getT2()));
   }
 
   /**

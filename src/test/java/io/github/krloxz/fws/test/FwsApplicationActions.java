@@ -33,10 +33,18 @@ public class FwsApplicationActions {
   /**
    * @param freelancer
    *        DTO representing the freelancer that will be affected by the invoked actions
-   * @return the {@link FreelancerActions}
+   * @return the actions that can be executed on an individual freelancer
    */
   public FreelancerActions freelancer(final FreelancerDto freelancer) {
     return new FreelancerActions(freelancer, this);
+  }
+
+  /**
+   * @return the actions that can be executed on the collection of freelancers registered in the
+   *         system
+   */
+  public FreelancerCollectionActions freelancers() {
+    return new FreelancerCollectionActions(this);
   }
 
   /**

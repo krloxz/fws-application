@@ -5,6 +5,10 @@ info:
   description: >
     The Freelancer Web Services API is a RESTful API that allows the registration and retrieval of freelancers.
     It is a simple API that serves as a reference for the development of RESTful APIs.
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
 paths:
   /:
     get:
@@ -38,7 +42,20 @@ paths:
     get:
       tags:
         - Freelancers
-      description: Retrieves all the freelancers registered on the system.
+      description: Lists a page of freelancers already registered on the system.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: 0-based page number to list
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: Number of elements per page
       responses:
         "200":
           description: Success
@@ -47,7 +64,6 @@ paths:
               schema:
                 type: object
                 required:
-                  - _embedded
                   - _links
                 properties:
                   _embedded:
@@ -63,9 +79,35 @@ paths:
                     type: object
                     required:
                       - self
+                      - register
                     properties:
                       self:
                         $ref: "#/components/schemas/Link"
+                      register:
+                        $ref: "#/components/schemas/Link"
+                      first:
+                        $ref: "#/components/schemas/Link"
+                      prev:
+                        $ref: "#/components/schemas/Link"
+                      next:
+                        $ref: "#/components/schemas/Link"
+                      last:
+                        $ref: "#/components/schemas/Link"
+                  page:
+                    type: object
+                    properties:
+                      size:
+                        type: integer
+                        example: 20
+                      totalElements:
+                        type: integer
+                        example: 1
+                      totalPages:
+                        type: integer
+                        example: 1
+                      number:
+                        type: integer
+                        example: 0
         default:
           $ref: "#/components/responses/Error"
     post:
