@@ -1,66 +1,66 @@
 package io.github.krloxz.fws.test;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.assertj.core.api.AbstractAssert;
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-
 /**
- * {@link ActionsRecorder} that also provides access to the recorded actions.
+ * Collection of system actions that have been recorded for the execution of a test.
  *
  * @author Carlos Gomez
  */
-class RecordedActions extends AbstractAssert<RecordedActions, List<Supplier<ResponseSpec>>> implements ActionsRecorder {
+class RecordedActions {
 
-  private final List<Supplier<ResponseSpec>> actions;
+  private final List<Supplier<ResultAssertions>> actions;
 
   RecordedActions() {
-    this(new ArrayList<>());
+    this.actions = new ArrayList<>();
   }
 
-  private RecordedActions(final List<Supplier<ResponseSpec>> actions) {
-    super(actions, RecordedActions.class);
-    this.actions = actions;
-  }
-
-  @Override
-  public void add(final Supplier<ResponseSpec> action) {
-    this.actions.add(action);
+  void add(final Supplier<ResultAssertions> result) {
+    this.actions.add(result);
   }
 
   /**
-   * Plays the recorded actions in the order they were recorded and asserts that all they succeeded.
+   * Plays the recorded actions in the order they were recorded and asserts that all they succeed.
    */
   void succeed() {
     try {
       this.actions.stream()
           .map(Supplier::get)
-          .forEach(response -> response.expectStatus().is2xxSuccessful().returnResult(Void.class));
-    } catch (final AssertionError e) {
-      throw failure("Not all the recorded actions succeded: %s", e);
+          .forEach(result -> result.andExpect(status().is2xxSuccessful()));
+    } catch (final Throwable e) {
+      throw new AssertionError("Not all recorded actions succeeded", e);
     }
   }
 
   /**
-   * Plays the recorded actions in the order they were recorded to get the response of the last
-   * action. All the actions, but the last one, are asserted to be successful.
+   * Plays the recorded actions in the order they were recorded to get the result of the last action.
+   * All the actions, but the last one, are asserted to be successful.
    *
-   * @return the response of the last action
+   * @return the result of the last action
    */
-  ResponseSpec lastResponse() {
+  ResultAssertions lastResult() {
+    return playActionsAndReturnLast()
+        .orElseThrow(() -> new IllegalStateException("No actions have been recorded"));
+  }
+
+  private Optional<ResultAssertions> playActionsAndReturnLast() {
     try {
       return this.actions.stream()
           .map(Supplier::get)
-          .reduce((first, second) -> {
-            first.expectStatus().is2xxSuccessful().returnResult(Void.class);
-            return second;
-          })
-          .orElseThrow(() -> new IllegalStateException("No actions have been recorded"));
-    } catch (final AssertionError e) {
-      throw failure("Not all the recorded actions succeded: %s", e);
+          .reduce(this::executeFirstThenReturnSecond);
+    } catch (final Throwable e) {
+      throw new AssertionError("Not all previous actions succeeded", e);
     }
+  }
+
+  private ResultAssertions executeFirstThenReturnSecond(final ResultAssertions first, final ResultAssertions second) {
+    first.andExpect(status().is2xxSuccessful());
+    return second;
   }
 
 }

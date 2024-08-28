@@ -29,16 +29,19 @@ The unit tests are designed to support refactoring and are decoupled from implem
 
 The unit tests are written using [JUnit 5](https://junit.org/junit5/) and a DSL developed for the system.
 
-This DSL encapsulates the system functionalities and its side effects in a fluent interface that allows the developer to write expressive tests. For example, the following test checks if the system registers two freelancers:
+This DSL encapsulates the system functionalities and its side effects in a fluent interface that allows the developer to write expressive tests. For example, the following test checks if the system is able to register freelancers:
 
 ```java
-this.fwsApplication.running()
-    .when()
-    .freelancers(tonyStark(), steveRogers()).registered()
-    .then()
-    .freelancers()
-    .extracting(FreelancerDto::firstName)
-    .contains("Tony", "Steve");
+  @Test
+  void registersFreelancers() {
+    this.fwsApplication.running()
+        .when()
+        .freelancer(tonyStark()).registered()
+        .freelancer(steveRogers()).registered()
+        .then()
+        .freelancers()
+        .contains(jsonPath("_embedded.freelancers[*].firstName").value(hasItems("Tony", "Steve")));
+  }
 ```
 
 The intent is to make the tests more readable and maintainable, while avoiding the fragility of traditional unit tests that are coupled to implementation classes and use mocks and stubs. Look at the [FreelancersApiTest](src/test/java/io/github/krloxz/fws/FreelancersApiTest.java) class to see more examples of tests written using the DSL.

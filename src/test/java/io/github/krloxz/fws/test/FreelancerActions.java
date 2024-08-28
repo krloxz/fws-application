@@ -1,8 +1,5 @@
 package io.github.krloxz.fws.test;
 
-import org.springframework.hateoas.MediaTypes;
-import org.springframework.test.web.reactive.server.WebTestClient;
-
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
@@ -17,16 +14,12 @@ public class FreelancerActions {
 
   private final FreelancerDto freelancer;
   private final FwsApplicationActions applicationActions;
-  private final WebTestClient webClient;
-  private final ActionsRecorder actionRecorder;
+  private final FwsApplicationRestApi restApi;
 
-  FreelancerActions(
-      final FreelancerDto freelancer,
-      final FwsApplicationActions applicationActions) {
+  FreelancerActions(final FreelancerDto freelancer, final FwsApplicationActions applicationActions) {
     this.freelancer = freelancer;
     this.applicationActions = applicationActions;
-    this.webClient = applicationActions.webClient();
-    this.actionRecorder = applicationActions.actionsRecorder();
+    this.restApi = applicationActions.restApi();
   }
 
   /**
@@ -35,12 +28,7 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions registered() {
-    this.actionRecorder.add(
-        () -> this.webClient.post()
-            .uri("/freelancers")
-            .accept(MediaTypes.HAL_JSON)
-            .bodyValue(this.freelancer)
-            .exchange());
+    this.applicationActions.register(() -> this.restApi.post("/freelancers", this.freelancer));
     return this.applicationActions;
   }
 
@@ -50,11 +38,7 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions retrieved() {
-    this.actionRecorder.add(
-        () -> this.webClient.get()
-            .uri("/freelancers/" + freelancerId())
-            .accept(MediaTypes.HAL_JSON)
-            .exchange());
+    this.applicationActions.register(() -> this.restApi.get("/freelancers/" + freelancerId()));
     return this.applicationActions;
   }
 
@@ -66,12 +50,8 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions movesTo(final AddressDto newAddress) {
-    this.actionRecorder.add(
-        () -> this.webClient.patch()
-            .uri("/freelancers/" + freelancerId() + "/address")
-            .accept(MediaTypes.HAL_JSON)
-            .bodyValue(newAddress)
-            .exchange());
+    this.applicationActions.register(
+        () -> this.restApi.patch("/freelancers/" + freelancerId() + "/address", newAddress));
     return this.applicationActions;
   }
 
@@ -83,12 +63,8 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions updatesNicknames(final String... nicknames) {
-    this.actionRecorder.add(
-        () -> this.webClient.patch()
-            .uri("/freelancers/" + freelancerId() + "/nicknames")
-            .accept(MediaTypes.HAL_JSON)
-            .bodyValue(nicknames)
-            .exchange());
+    this.applicationActions.register(
+        () -> this.restApi.patch("/freelancers/" + freelancerId() + "/nicknames", nicknames));
     return this.applicationActions;
   }
 
@@ -100,12 +76,7 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions updatesWage(final HourlyWageDto wage) {
-    this.actionRecorder.add(
-        () -> this.webClient.patch()
-            .uri("/freelancers/" + freelancerId() + "/wage")
-            .accept(MediaTypes.HAL_JSON)
-            .bodyValue(wage)
-            .exchange());
+    this.applicationActions.register(() -> this.restApi.patch("/freelancers/" + freelancerId() + "/wage", wage));
     return this.applicationActions;
   }
 
@@ -117,12 +88,8 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions addsCommunicationChannel(final CommunicationChannelDto channel) {
-    this.actionRecorder.add(
-        () -> this.webClient.post()
-            .uri("/freelancers/" + freelancerId() + "/communication-channels")
-            .accept(MediaTypes.HAL_JSON)
-            .bodyValue(channel)
-            .exchange());
+    this.applicationActions.register(
+        () -> this.restApi.post("/freelancers/" + freelancerId() + "/communication-channels", channel));
     return this.applicationActions;
   }
 
@@ -134,11 +101,8 @@ public class FreelancerActions {
    * @return the {@link FwsApplicationActions}
    */
   public FwsApplicationActions removesCommunicationChannel(final String id) {
-    this.actionRecorder.add(
-        () -> this.webClient.delete()
-            .uri("/freelancers/" + freelancerId() + "/communication-channels/" + id)
-            .accept(MediaTypes.HAL_JSON)
-            .exchange());
+    this.applicationActions.register(
+        () -> this.restApi.delete("/freelancers/" + freelancerId() + "/communication-channels/" + id));
     return this.applicationActions;
   }
 

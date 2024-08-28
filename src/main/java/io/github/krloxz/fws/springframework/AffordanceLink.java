@@ -1,56 +1,104 @@
 package io.github.krloxz.fws.springframework;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
+import java.util.Optional;
+
 import org.springframework.hateoas.AffordanceModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpMethod;
 
 /**
  * A {@link Link} that renders as an affordance.
  * <p>
- * Affordance links are used as a simple alternative to HAL FORMS that still allows to communicate
- * the capabilities of a resource. They are created from a {@link Link} and are rendered as a link
- * with a relation named after the name of the class method used to create the link (HAL affordance)
- * when the {@link #AFFORDANCE_REL} is used.
+ * Affordance links are used to describe the capabilities of a resource and are a simple alternative
+ * to HAL FORMS. They are rendered as entries of a JSON map:
+ *
+ * <pre>
+ * "relation-name" : {
+ *   "href" : "/path/to/resource",
+ *   "method" : "HTTP_METHOD"
+ *  }
+ * </pre>
+ * <ul>
+ * <li>The relation name describes the purpose of the link and could be any string or a standard
+ * IANA-based link relation
+ * <li>Alike links, the href property points to an HTTP resource
+ * <li>The method specifies the HTTP method to be used when interacting with the resource
+ * </ul>
  *
  * @author Carlos Gomez
  */
 public class AffordanceLink extends Link {
 
-  public static final LinkRelation AFFORDANCE_REL = LinkRelation.of("affordance");
   private static final long serialVersionUID = 6581720194164681180L;
-  private final AffordanceModel affordance;
+  private static final LinkRelation AFFORDANCE_REL = LinkRelation.of("affordance");
+  private final String method;
+
+  private AffordanceLink(final String href, final LinkRelation relation, final String method) {
+    super(href, relation);
+    this.method = method;
+  }
 
   /**
-   * Creates a new {@link AffordanceLink} from a given {@link Link}.
+   * Creates an affordance link for the invocation of a controller method.
+   *
+   * @param methodInvocation
+   *        a controller method invocation created with
+   *        {@link org.springframework.hateoas.server.mvc.WebMvcLinkBuilder#methodOn}
+   * @return an affordance link for the given method
+   */
+  public static AffordanceLink affordanceLinkTo(final Object methodInvocation) {
+    return toAffordanceLink(linkTo(methodInvocation).withRel(AFFORDANCE_REL));
+  }
+
+  /**
+   * Attempts to extract the {@link Link#getAffordances() affordance information} from the given link
+   * and creates an affordance link from it. If an affordance is present, the relation name and the
+   * method are extracted from it; otherwise, the relation name is extracted from the given link and
+   * the method defaults to GET.
    *
    * @param link
-   *        the link to be converted into an affordance link
+   *        the link to convert
+   * @return the given link as an affordance link
    */
-  public AffordanceLink(final Link link) {
-    super(link.getHref(), link.getRel());
-    this.affordance = link.getAffordances()
-        .get(0)
-        .getAffordanceModel(MediaTypes.HAL_FORMS_JSON);
+  public static AffordanceLink toAffordanceLink(final Link link) {
+    final Optional<AffordanceModel> firstAffordance = link.getAffordances()
+        .stream()
+        .findFirst()
+        .map(affordance -> affordance.getAffordanceModel(MediaTypes.HAL_FORMS_JSON));
+    final var relation = firstAffordance.map(AffordanceModel::getName)
+        .map(LinkRelation::of)
+        .orElseGet(link::getRel);
+    final var method = firstAffordance.map(AffordanceModel::getHttpMethod)
+        .map(HttpMethod::name)
+        .orElse("GET");
+    return new AffordanceLink(link.getHref(), relation, method);
   }
 
   /**
-   * @return the name of the HTTP method of this affordance
+   * @return the HTTP method to be used when interacting with this link
    */
   public String getMethod() {
-    return this.affordance.getHttpMethod().name();
+    return this.method;
   }
 
-  /**
-   * @return the standard IANA relation of this affordance if it has one, the name of the affordance
-   *         otherwise
-   */
   @Override
-  public LinkRelation getRel() {
-    if (AFFORDANCE_REL.equals(super.getRel())) {
-      return LinkRelation.of(this.affordance.getName());
-    }
-    return super.getRel();
+  public Link withSelfRel() {
+    return withRel(IanaLinkRelations.SELF);
+  }
+
+  @Override
+  public Link withRel(final String relation) {
+    return withRel(LinkRelation.of(relation));
+  }
+
+  @Override
+  public Link withRel(final LinkRelation relation) {
+    return new AffordanceLink(getHref(), relation, this.method);
   }
 
 }

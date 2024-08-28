@@ -3,14 +3,13 @@ package io.github.krloxz.fws.freelancer.infra;
 import static io.github.krloxz.fws.infra.jooq.Tables.ADDRESSES;
 import static io.github.krloxz.fws.infra.jooq.Tables.COMMUNICATION_CHANNELS;
 import static io.github.krloxz.fws.infra.jooq.Tables.FREELANCERS;
-import static java.util.function.Predicate.not;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import org.jooq.Batch;
 import org.jooq.DSLContext;
-import org.jooq.DeleteConditionStep;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
@@ -21,9 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
 import io.github.krloxz.fws.freelancer.domain.PageSpec;
-import io.github.krloxz.fws.infra.jooq.tables.records.CommunicationChannelsRecord;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * JOOQ implementation of the {@link FreelancerRepository}.
@@ -43,80 +39,77 @@ class JooqFreelancerRepository implements FreelancerRepository {
   }
 
   @Override
-  public Mono<Void> deleteAll() {
-    return Mono.from(this.create.delete(FREELANCERS)).then();
+  public void deleteAll() {
+    this.create.delete(FREELANCERS).execute();
   }
 
   @Override
-  public Mono<Freelancer> save(final Freelancer freelancer) {
-    return Flux.from(this.create.insertInto(FREELANCERS).set(this.mapper.toFreelancersRecord(freelancer)))
-        .thenMany(this.create.insertInto(ADDRESSES).set(this.mapper.toAddressesRecord(freelancer)))
-        .thenMany(insertChannels(freelancer))
-        .then(Mono.just(freelancer));
+  public Freelancer save(final Freelancer freelancer) {
+    this.create.insertInto(FREELANCERS)
+        .set(this.mapper.toFreelancersRecord(freelancer))
+        .execute();
+    this.create.insertInto(ADDRESSES)
+        .set(this.mapper.toAddressesRecord(freelancer))
+        .execute();
+    this.mapper.toCommunicationChannelsRecords(freelancer)
+        .forEach(channel -> this.create.insertInto(COMMUNICATION_CHANNELS).set(channel).execute());
+    return freelancer;
   }
 
   @Override
-  public Mono<Freelancer> update(final Freelancer freelancer) {
-    return Flux.from(
-        this.create.update(FREELANCERS)
-            .set(this.mapper.toFreelancersRecord(freelancer))
-            .where(FREELANCERS.ID.eq(freelancer.id())))
-        .thenMany(this.create.delete(ADDRESSES).where(ADDRESSES.FREELANCER_ID.eq(freelancer.id())))
-        .thenMany(this.create.insertInto(ADDRESSES).set(this.mapper.toAddressesRecord(freelancer)))
-        .thenMany(deleteChannels(freelancer))
-        .thenMany(insertChannels(freelancer))
-        .then(Mono.just(freelancer));
+  public Freelancer update(final Freelancer freelancer) {
+    this.create.update(FREELANCERS)
+        .set(this.mapper.toFreelancersRecord(freelancer))
+        .where(FREELANCERS.ID.eq(freelancer.id()))
+        .execute();
+    this.create.delete(ADDRESSES)
+        .where(ADDRESSES.FREELANCER_ID.eq(freelancer.id()))
+        .execute();
+    this.create.insertInto(ADDRESSES)
+        .set(this.mapper.toAddressesRecord(freelancer))
+        .execute();
+    this.create.delete(COMMUNICATION_CHANNELS)
+        .where(COMMUNICATION_CHANNELS.FREELANCER_ID.eq(freelancer.id()))
+        .execute();
+    this.mapper.toCommunicationChannelsRecords(freelancer)
+        .forEach(channel -> this.create.insertInto(COMMUNICATION_CHANNELS).set(channel).execute());
+    return freelancer;
   }
 
   @Override
-  public Flux<Freelancer> findAllBy(final PageSpec pageSpec) {
-    return Flux.from(
-        this.create.select(FREELANCERS.ID)
-            .from(FREELANCERS)
-            .orderBy(FREELANCERS.LAST_NAME)
-            .offset(pageSpec.number() * pageSpec.size())
-            .limit(pageSpec.size()))
-        .<UUID>map(Record1::value1)
-        .flatMap(this::findRecordById)
-        .map(this.mapper::fromRecords);
+  public List<Freelancer> findAllBy(final PageSpec pageSpec) {
+    return this.create.select(FREELANCERS.ID)
+        .from(FREELANCERS)
+        .orderBy(FREELANCERS.LAST_NAME)
+        .offset(pageSpec.number() * pageSpec.size())
+        .limit(pageSpec.size())
+        .fetch()
+        .map(Record1::value1)
+        .stream()
+        .map(this::findRecordById)
+        .flatMap(Optional::stream)
+        .map(this.mapper::fromRecords)
+        .collect(Collectors.toList());
   }
 
   @Override
-  public Mono<Freelancer> findById(final UUID id) {
-    return findRecordById(id)
-        .filter(not(List::isEmpty))
-        .map(this.mapper::fromRecords);
+  public Optional<Freelancer> findById(final UUID id) {
+    return findRecordById(id).map(this.mapper::fromRecords);
   }
 
   @Override
-  public Mono<Integer> count() {
-    return Mono.from(
-        this.create.selectCount().from(FREELANCERS))
-        .map(Record1::value1);
+  public int count() {
+    return this.create.selectCount().from(FREELANCERS).fetchOne().value1();
   }
 
-  private DeleteConditionStep<CommunicationChannelsRecord> deleteChannels(final Freelancer freelancer) {
-    return this.create.delete(COMMUNICATION_CHANNELS)
-        .where(COMMUNICATION_CHANNELS.FREELANCER_ID.eq(freelancer.id()));
-  }
-
-  // Looks like batch support is not yet available in jOOQ: https://github.com/jOOQ/jOOQ/issues/14874
-  private Batch insertChannels(final Freelancer freelancer) {
-    return this.create.batch(
-        this.mapper.toCommunicationChannelsRecords(freelancer)
-            .stream()
-            .map(channel -> this.create.insertInto(COMMUNICATION_CHANNELS).set(channel))
-            .toList());
-  }
-
-  private Mono<List<Record>> findRecordById(final UUID id) {
-    return Flux.from(
-        this.create.select(DSL.asterisk())
-            .from(FREELANCERS)
-            .join(ADDRESSES).onKey()
-            .leftJoin(COMMUNICATION_CHANNELS).onKey()
-            .where(FREELANCERS.ID.eq(id)))
-        .collectList();
+  private Optional<List<Record>> findRecordById(final UUID id) {
+    final var records = this.create.select(DSL.asterisk())
+        .from(FREELANCERS)
+        .join(ADDRESSES).onKey()
+        .leftJoin(COMMUNICATION_CHANNELS).onKey()
+        .where(FREELANCERS.ID.eq(id))
+        .fetch();
+    return records.isEmpty() ? Optional.empty() : Optional.of(records);
   }
 
 }

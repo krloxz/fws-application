@@ -1,7 +1,8 @@
 package io.github.krloxz.fws.test;
 
+import java.util.function.Supplier;
+
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 
@@ -14,7 +15,6 @@ import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
  */
 public class FwsApplicationActions {
 
-  private final WebTestClient webClient;
   private final RecordedActions recordedActions;
   private final ApplicationContext context;
 
@@ -24,9 +24,8 @@ public class FwsApplicationActions {
    * @param context
    *        the current Spring application context, used to manually retrieve required dependencies
    */
-  public FwsApplicationActions(final ApplicationContext context) {
+  FwsApplicationActions(final ApplicationContext context) {
     this.context = context;
-    this.webClient = context.getBean(WebTestClient.class);
     this.recordedActions = new RecordedActions();
   }
 
@@ -54,19 +53,12 @@ public class FwsApplicationActions {
     return new FwsApplicationAssertions(this.recordedActions, this.context);
   }
 
-  /**
-   * @return the action recorder where all the actions required for the current test are being
-   *         recorded
-   */
-  ActionsRecorder actionsRecorder() {
-    return this.recordedActions;
+  void register(final Supplier<ResultAssertions> result) {
+    this.recordedActions.add(result);
   }
 
-  /**
-   * @return a web test client ready to use
-   */
-  public WebTestClient webClient() {
-    return this.webClient;
+  FwsApplicationRestApi restApi() {
+    return this.context.getBean(FwsApplicationRestApi.class);
   }
 
 }

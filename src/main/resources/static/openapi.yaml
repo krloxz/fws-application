@@ -251,9 +251,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/CommunicationChannel"
+              $ref: "#/components/schemas/CommunicationChannel"
       responses:
         "200":
           description: Success
@@ -299,6 +297,7 @@ components:
       properties:
         id:
           type: string
+          nullable: true
           description: Unique identifier for the freelancer
           example: "fa8508ed-8b7b-4be7-b372-ac1094c709b5"
         firstName:
@@ -371,7 +370,6 @@ components:
         - wage
         - nicknames
         - communicationChannels
-        - _links
     Address:
       type: object
       description: Address information
@@ -422,6 +420,7 @@ components:
       properties:
         id:
           type: string
+          nullable: true
           description: Unique identifier for the communication channel
           example: "c7e8f8e7-7f7e-4e7f-8e7f-7e7f8e7f7e7f"
         value:
@@ -452,6 +451,10 @@ components:
           type: string
           description: HTTP method for the link
           example: "GET"
+        templated:
+          type: boolean
+          description: Whether the URI contains template parameters
+          example: false
       required:
         - href
         - method

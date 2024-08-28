@@ -1,9 +1,8 @@
 package io.github.krloxz.fws.freelancer.domain;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Repository for freelancers.
@@ -17,7 +16,7 @@ public interface FreelancerRepository {
    *
    * @return a {@link Mono} that completes when all freelancers are deleted
    */
-  Mono<Void> deleteAll();
+  void deleteAll();
 
   /**
    * Saves a freelancer.
@@ -26,7 +25,7 @@ public interface FreelancerRepository {
    *        the freelancer to save
    * @return a {@link Mono} that completes when the freelancer is saved
    */
-  Mono<Freelancer> save(Freelancer freelancer);
+  Freelancer save(Freelancer freelancer);
 
   /**
    * Updates a freelancer.
@@ -35,7 +34,7 @@ public interface FreelancerRepository {
    *        the freelancer to update
    * @return a {@link Mono} that completes when the freelancer is updated
    */
-  Mono<Freelancer> update(Freelancer freelancer);
+  Freelancer update(Freelancer freelancer);
 
   /**
    * Returns a page of freelancers meeting the criteria specified by the given {@link PageSpec}.
@@ -44,7 +43,7 @@ public interface FreelancerRepository {
    *        specification for the page to return
    * @return a {@link Flux} with the requested page of freelancers
    */
-  Flux<Freelancer> findAllBy(PageSpec pageSpec);
+  List<Freelancer> findAllBy(PageSpec pageSpec);
 
   /**
    * Finds a freelancer by its unique identifier.
@@ -53,11 +52,11 @@ public interface FreelancerRepository {
    *        the unique identifier of the freelancer to find
    * @return a {@link Mono} with the freelancer, if found
    */
-  Mono<Freelancer> findById(UUID id);
+  Optional<Freelancer> findById(UUID id);
 
   /**
    * @return a {@link Mono} with the count of freelancers in the repository
    */
-  Mono<Integer> count();
+  int count();
 
 }

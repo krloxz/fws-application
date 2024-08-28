@@ -1,30 +1,30 @@
 package io.github.krloxz.fws;
 
-import java.util.Locale;
+import java.net.URI;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.lang.Nullable;
 import org.springframework.validation.FieldError;
-import org.springframework.web.ErrorResponse;
+import org.springframework.web.ErrorResponseException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.support.WebExchangeBindException;
-import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ServerErrorException;
-import org.springframework.web.server.ServerWebExchange;
-
-import reactor.core.publisher.Mono;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * Global exception handler that takes advantage of {@link ResponseEntityExceptionHandler} to handle
  * all application raised exceptions by returning errors formatted as per the Internet standard
- * <a href="https://datatracker.ietf.org/doc/html/rfc7807">Problem Details for HTTP APIs (RFC
- * 7807)</a>.
+ * <a href="https://datatracker.ietf.org/doc/html/rfc9457">Problem Details for HTTP APIs (RFC
+ * 9457)</a>.
  *
  * @author Carlos Gomez
  */
@@ -34,53 +34,63 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   private static final Log LOGGER = LogFactory.getLog(GlobalExceptionHandler.class);
 
   /**
-   * Handles unexpected exceptions.
+   * Wraps unexpected exceptions into a {@link ServerErrorException} and delegates to
+   * {@link #handleErrorResponseException(ErrorResponseException, HttpHeaders, HttpStatusCode, WebRequest)}.
    *
-   * @param exception
-   *        the exception
-   * @param exchange
-   *        the current request-response exchange
-   * @return a {@link Mono} wrapping an error response when the exchange response is not yet
-   *         committed, a failing {@link Mono} otherwise
+   * @throws Exception
    */
   @ExceptionHandler
-  public Mono<ResponseEntity<Object>> handleUnexpectedException(
-      final Throwable exception, final ServerWebExchange exchange) {
-    final var serverException = new ServerErrorException("The server is not able to handle the request", exception);
-    return handleException(serverException, exchange);
+  public ResponseEntity<Object> handleUnexpectedException(final Throwable exception, final WebRequest request)
+      throws Exception {
+    return handleException(
+        new ServerErrorException("The server is not able to handle the request", exception), request);
   }
 
-  /**
-   * Customizes handling of {@link ServerErrorException} to add logging.
-   */
   @Override
-  protected Mono<ResponseEntity<Object>> handleServerErrorException(
-      final ServerErrorException exception,
+  protected ResponseEntity<Object> handleErrorResponseException(
+      final ErrorResponseException exception,
       final HttpHeaders headers,
       final HttpStatusCode status,
-      final ServerWebExchange exchange) {
-    LOGGER.error("The request %s produced a server error: ".formatted(format(exchange.getRequest())), exception);
-    return super.handleServerErrorException(exception, headers, status, exchange);
+      final WebRequest request) {
+    LOGGER.error("The request %s produced a server error: ".formatted(format(request)), exception);
+    return super.handleErrorResponseException(exception, headers, status, request);
   }
 
-  private String format(final ServerHttpRequest request) {
-    return request.getMethod() + " " + request.getURI();
-  }
-
-  /**
-   * Customizes handling of {@link WebExchangeBindException} to add the binding errors to the response
-   * and set a custom problem type.
-   */
   @Override
-  protected Mono<ResponseEntity<Object>> handleWebExchangeBindException(
-      final WebExchangeBindException exception,
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      final MethodArgumentNotValidException exception,
       final HttpHeaders headers,
-      final HttpStatusCode status,
-      final ServerWebExchange exchange) {
+      final HttpStatusCode status, final WebRequest request) {
+    final var response = super.handleMethodArgumentNotValid(exception, headers, status, request);
+    if (response.getBody() instanceof final ProblemDetail problem) {
+      problem.setType(requestUri().resolve("/probs/validation-error.html"));
+      problem.setProperty("errors", getValidationErrors(exception));
+    }
+    return response;
+  }
 
-    final var problem = exception.updateAndGetBody(getMessageSource(), getLocale(exchange));
-    problem.setType(exchange.getRequest().getURI().resolve("/probs/validation-error.html"));
-    final var errors = exception.getAllErrors()
+  @Override
+  protected ResponseEntity<Object> createResponseEntity(
+      final Object body, final HttpHeaders headers, final HttpStatusCode statusCode, final WebRequest request) {
+    if (body instanceof final ProblemDetail problem) {
+      problem.setType(requestUri().resolve("/probs/error.html"));
+    }
+    return super.createResponseEntity(body, headers, statusCode, request);
+  }
+
+  private static String format(final WebRequest request) {
+    if (request instanceof final ServletWebRequest servletRequest) {
+      return servletRequest.getRequest().getMethod() + " " + servletRequest.getRequest().getRequestURI();
+    }
+    return "";
+  }
+
+  private static URI requestUri() {
+    return ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+  }
+
+  private static List<Error> getValidationErrors(final MethodArgumentNotValidException exception) {
+    return exception.getAllErrors()
         .stream()
         .map(error -> {
           if (error instanceof final FieldError fieldError) {
@@ -88,36 +98,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
           }
           return new Error(null, error.getDefaultMessage());
         }).toList();
-    problem.setProperty("errors", errors);
-
-    return handleExceptionInternal(exception, problem, headers, status, exchange);
-  }
-
-  /**
-   * Customizes internal handling to set a custom problem type when body parameter is null.
-   */
-  @Override
-  protected Mono<ResponseEntity<Object>> handleExceptionInternal(
-      final Exception exception,
-      @Nullable final Object body,
-      @Nullable final HttpHeaders headers,
-      final HttpStatusCode status,
-      final ServerWebExchange exchange) {
-
-    if (exchange.getResponse().isCommitted()) {
-      return Mono.error(exception);
-    }
-    if (body == null && exception instanceof final ErrorResponse errorResponse) {
-      final var problem = errorResponse.updateAndGetBody(getMessageSource(), getLocale(exchange));
-      problem.setType(exchange.getRequest().getURI().resolve("/probs/error.html"));
-      return createResponseEntity(problem, headers, status, exchange);
-    }
-    return createResponseEntity(body, headers, status, exchange);
-  }
-
-  private static Locale getLocale(final ServerWebExchange exchange) {
-    final var locale = exchange.getLocaleContext().getLocale();
-    return locale != null ? locale : Locale.getDefault();
   }
 
   private static record Error(String attribute, String detail) {

@@ -1,5 +1,6 @@
 package io.github.krloxz.fws.freelancer.application;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +31,8 @@ abstract class FreelancerDtoMapper {
   @Mapping(target = "lastName", source = "name.last")
   @Mapping(target = "middleName", source = "name.middle")
   public abstract FreelancerDto toDto(Freelancer freelancer);
+
+  public abstract List<FreelancerDto> toDto(List<Freelancer> freelancers);
 
   @InheritInverseConfiguration
   public abstract Freelancer fromDto(FreelancerDto dto);

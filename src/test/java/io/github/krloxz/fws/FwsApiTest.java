@@ -1,10 +1,11 @@
 package io.github.krloxz.fws;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.MediaTypes;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
+import io.github.krloxz.fws.test.FwsApplicationRestApi;
 import io.github.krloxz.fws.test.FwsApplicationTest;
 
 /**
@@ -16,16 +17,11 @@ import io.github.krloxz.fws.test.FwsApplicationTest;
 class FwsApiTest {
 
   @Autowired
-  private WebTestClient webClient;
+  private FwsApplicationRestApi restApi;
 
   @Test
   void listResources() {
-    this.webClient.get()
-        .uri("/")
-        .accept(MediaTypes.HAL_JSON)
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody();
+    this.restApi.get("/").andExpect(status().isOk());
   }
 
 }

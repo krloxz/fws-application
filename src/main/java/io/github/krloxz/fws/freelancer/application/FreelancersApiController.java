@@ -1,10 +1,15 @@
 package io.github.krloxz.fws.freelancer.application;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,11 +27,9 @@ import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
-import io.github.krloxz.fws.freelancer.application.dtos.PageDto;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
 import io.github.krloxz.fws.freelancer.domain.PageSpec;
-import reactor.core.publisher.Mono;
 
 /**
  * Restful controller that exposes the Freelancers API.
@@ -41,31 +43,32 @@ public class FreelancersApiController {
 
   private final FreelancerRepository repository;
   private final FreelancerDtoMapper mapper;
+  private final FreelancerDtoAssembler assembler;
 
-  FreelancersApiController(final FreelancerRepository repository, final FreelancerDtoMapper mapper) {
+  FreelancersApiController(
+      final FreelancerRepository repository,
+      final FreelancerDtoMapper mapper,
+      final FreelancerDtoAssembler assembler) {
     this.repository = repository;
     this.mapper = mapper;
+    this.assembler = assembler;
   }
 
   /**
-   * @param page
-   *        optional 0-based integer representing the page number, defaults to 0
-   * @param size
-   *        optional integer representing the size of the page, defaults to 5
+   * @param pageRequest
+   *        details of the requested page
    * @return a paginated list of freelancers
    */
   @GetMapping
   @Transactional(readOnly = true)
-  public Mono<PageDto<FreelancerDto>> list(
-      @RequestParam final Optional<Integer> page,
-      @RequestParam final Optional<Integer> size) {
-    final var pageNumber = page.orElse(0);
-    final var pageSize = size.orElse(5);
-    return this.repository.findAllBy(new PageSpec(pageNumber, pageSize))
+  public CollectionModel<EntityModel<FreelancerDto>> list(final Pageable pageRequest) {
+    return pageRequest.toOptional()
+        .map(this::toPageSpec)
+        .map(this.repository::findAllBy)
         .map(this.mapper::toDto)
-        .collectList()
-        .zipWith(this.repository.count().cache())
-        .map(tuple -> new PageDto<>(tuple.getT1(), pageNumber, pageSize, tuple.getT2()));
+        .map(content -> getPage(pageRequest, content))
+        .map(this.assembler::toPagedModel)
+        .orElseThrow();
   }
 
   /**
@@ -77,8 +80,12 @@ public class FreelancersApiController {
    */
   @GetMapping("/{id}")
   @Transactional(readOnly = true)
-  public Mono<FreelancerDto> get(@PathVariable final String id) {
-    return findById(id).map(this.mapper::toDto);
+  public EntityModel<FreelancerDto> get(@PathVariable final String id) {
+    return Optional.of(id)
+        .map(this::findById)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
   /**
@@ -88,10 +95,15 @@ public class FreelancersApiController {
    *        freelancer's data with no identifier
    * @return the freelancer's data including the identifier that was assigned by the system
    */
-  @PostMapping(consumes = MediaType.ALL_VALUE)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Mono<FreelancerDto> register(@Validated @RequestBody final FreelancerDto dto) {
-    return this.repository.save(this.mapper.fromDto(dto)).map(this.mapper::toDto);
+  public EntityModel<FreelancerDto> register(@Validated @RequestBody final FreelancerDto dto) {
+    return Optional.of(dto)
+        .map(this.mapper::fromDto)
+        .map(this.repository::save)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
   /**
@@ -101,18 +113,21 @@ public class FreelancersApiController {
    *        freelancer identifier
    * @param newAddress
    *        new address data
-   * @return a {@link Mono} that emits the updated freelancer's data
+   * @return the updated freelancer's data
    * @throws ResponseStatusException
    *         404 - if the freelancer with the given ID does not exist
    */
   @PatchMapping("/{id}/address")
-  public Mono<FreelancerDto> changeAddress(
+  public EntityModel<FreelancerDto> changeAddress(
       @PathVariable final String id,
       @Validated @RequestBody final AddressDto newAddress) {
-    return findById(id)
-        .map(freelancer -> freelancer.movedTo(this.mapper.fromDto(newAddress)))
-        .flatMap(this.repository::update)
-        .map(this.mapper::toDto);
+    return Optional.of(newAddress)
+        .map(this.mapper::fromDto)
+        .map(findById(id)::movedTo)
+        .map(this.repository::update)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
   /**
@@ -122,18 +137,20 @@ public class FreelancersApiController {
    *        freelancer identifier
    * @param nicknames
    *        new nicknames
-   * @return a {@link Mono} that emits the updated freelancer's data
+   * @return the updated freelancer's data
    * @throws ResponseStatusException
    *         404 - if the freelancer with the given ID does not exist
    */
   @PatchMapping("/{id}/nicknames")
-  public Mono<FreelancerDto> updateNicknames(
+  public EntityModel<FreelancerDto> updateNicknames(
       @PathVariable final String id,
       @RequestBody final String[] nicknames) {
-    return findById(id)
-        .map(freelancer -> freelancer.withNicknames(nicknames))
-        .flatMap(this.repository::update)
-        .map(this.mapper::toDto);
+    return Optional.of(nicknames)
+        .map(findById(id)::withNicknames)
+        .map(this.repository::update)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
   /**
@@ -143,18 +160,21 @@ public class FreelancersApiController {
    *        freelancer identifier
    * @param wage
    *        new hourly wage
-   * @return a {@link Mono} that emits the updated freelancer's data
+   * @return the updated freelancer's data
    * @throws ResponseStatusException
    *         404 - if the freelancer with the given ID does not exist
    */
   @PatchMapping("/{id}/wage")
-  public Mono<FreelancerDto> updateWage(
+  public EntityModel<FreelancerDto> updateWage(
       @PathVariable final String id,
       @Validated @RequestBody final HourlyWageDto wage) {
-    return findById(id)
-        .map(freelancer -> freelancer.withHourlyWage(this.mapper.fromDto(wage)))
-        .flatMap(this.repository::update)
-        .map(this.mapper::toDto);
+    return Optional.of(wage)
+        .map(this.mapper::fromDto)
+        .map(findById(id)::withHourlyWage)
+        .map(this.repository::update)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
   /**
@@ -164,7 +184,7 @@ public class FreelancersApiController {
    *        freelancer identifier
    * @param channel
    *        communication channel data
-   * @return a {@link Mono} that emits the updated freelancer's data
+   * @return the updated freelancer's data
    * @throws ResponseStatusException
    *         404 - if the freelancer with the given ID does not exist
    * @implNote This operation simulates that there is a business requirement or a technology
@@ -177,13 +197,16 @@ public class FreelancersApiController {
    *           communication channel to having one.
    */
   @PostMapping("/{id}/communication-channels")
-  public Mono<FreelancerDto> addCommunicationChannel(
+  public EntityModel<FreelancerDto> addCommunicationChannel(
       @PathVariable final String id,
       @Validated @RequestBody final CommunicationChannelDto channel) {
-    return findById(id)
-        .map(freelancer -> freelancer.addCommunicationChannel(this.mapper.fromDto(channel)))
-        .flatMap(this.repository::update)
-        .map(this.mapper::toDto);
+    return Optional.of(channel)
+        .map(this.mapper::fromDto)
+        .map(findById(id)::addCommunicationChannel)
+        .map(this.repository::update)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
   /**
@@ -193,7 +216,7 @@ public class FreelancersApiController {
    *        freelancer identifier
    * @param channelId
    *        identifier of the communication channel to be removed
-   * @return a {@link Mono} that emits the updated freelancer's data
+   * @return the updated freelancer's data
    * @throws ResponseStatusException
    *         404 - if the freelancer with the given ID does not exist
    * @implNote This operation simulates that there is a business requirement or a technology
@@ -209,7 +232,7 @@ public class FreelancersApiController {
    *           <li>Entities are more difficult to manage than value objects.
    *           <li>Affordances to remove communication channels are more complex because the client
    *           should consider the possibility of having only one or multiple affordances, which is an
-   *           additional challenge for the standardization of the API since there are other
+   *           additional challenge for the standardization of the API, since there are other
    *           affordances that will never have multiple items and picking a single model that fits
    *           all is more difficult.
    *           </ul>
@@ -217,37 +240,43 @@ public class FreelancersApiController {
    *           manage sub-resources, in that case patch operations look more appropriate.
    */
   @DeleteMapping("/{id}/communication-channels/{channelId}")
-  public Mono<FreelancerDto> removeCommunicationChannel(
+  public EntityModel<FreelancerDto> removeCommunicationChannel(
       @PathVariable final String id,
       @PathVariable final String channelId) {
-    return findById(id)
-        .flatMap(freelancer -> removeCommunicationChannel(freelancer, channelId))
-        .flatMap(this.repository::update)
-        .map(this.mapper::toDto);
+    return Optional.of(removeCommunicationChannel(findById(id), channelId))
+        .map(this.repository::update)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
   }
 
-  private Mono<Freelancer> findById(final String id) {
+  private PageSpec toPageSpec(final Pageable pageable) {
+    return new PageSpec(pageable.getPageNumber(), pageable.getPageSize());
+  }
+
+  private Page<FreelancerDto> getPage(final Pageable pageRequest, final List<FreelancerDto> content) {
+    return PageableExecutionUtils.getPage(content, pageRequest, this.repository::count);
+  }
+
+  private Freelancer findById(final String id) {
     return toFreelancerId(id)
         .flatMap(this.repository::findById)
-        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
 
-  private Mono<UUID> toFreelancerId(final String id) {
+  private Optional<UUID> toFreelancerId(final String id) {
     try {
-      return Mono.just(UUID.fromString(id));
+      return Optional.of(UUID.fromString(id));
     } catch (final IllegalArgumentException e) {
-      return Mono.empty();
+      return Optional.empty();
     }
   }
 
-  private Mono<Freelancer> removeCommunicationChannel(final Freelancer freelancer, final String channelId) {
+  private Freelancer removeCommunicationChannel(final Freelancer freelancer, final String channelId) {
     return freelancer.removeCommunicationChannel(UUID.fromString(channelId))
-        .map(Mono::just)
-        .orElse(
-            Mono.error(
-                new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "This communication channel doesn't exist: " + channelId)));
+        .orElseThrow(
+            () -> new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_ENTITY, "This communication channel doesn't exist: " + channelId));
   }
 
 }

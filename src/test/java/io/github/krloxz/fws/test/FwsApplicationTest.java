@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest
 @ExtendWith(DatabaseCleaner.class)
 @Import(TestFwsApplicationConfig.class)
-@AutoConfigureWebTestClient(timeout = "30m")
+@AutoConfigureMockMvc
 public @interface FwsApplicationTest {
 
 }

@@ -1,5 +1,6 @@
 package io.github.krloxz.fws;
 
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -7,6 +8,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +17,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDtoBuilder;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
@@ -46,9 +48,7 @@ class FreelancersApiTest {
         .freelancer(steveRogers()).registered()
         .then()
         .freelancers()
-        .expectStatus().isOk()
-        .expectBody()
-        .jsonPath("_embedded.freelancers[*].firstName").value(hasItems("Tony", "Steve"));
+        .contains(jsonPath("_embedded.freelancers[*].firstName").value(hasItems("Tony", "Steve")));
   }
 
   @Test
@@ -57,16 +57,16 @@ class FreelancersApiTest {
         .when()
         .freelancer(tonyStark()).registered()
         .then()
-        .response()
-        .expectStatus().isCreated()
-        .expectBody()
-        .jsonPath("_links.collection.href").isNotEmpty()
-        .jsonPath("_links.self.href").isNotEmpty()
-        .jsonPath("_links.changeAddress.href").isNotEmpty()
-        .jsonPath("_links.updateNicknames.href").isNotEmpty()
-        .jsonPath("_links.updateWage.href").isNotEmpty()
-        .jsonPath("_links.addCommunicationChannel.href").isNotEmpty()
-        .jsonPath("_links.removeCommunicationChannel").value(hasSize(tonyStark().communicationChannels().size()));
+        .result()
+        .contains(status().isCreated())
+        .contains(jsonPath("_links.collection.href").isNotEmpty())
+        .contains(jsonPath("_links.self.href").isNotEmpty())
+        .contains(jsonPath("_links.changeAddress.href").isNotEmpty())
+        .contains(jsonPath("_links.updateNicknames.href").isNotEmpty())
+        .contains(jsonPath("_links.updateWage.href").isNotEmpty())
+        .contains(jsonPath("_links.addCommunicationChannel.href").isNotEmpty())
+        .contains(jsonPath("_links.removeCommunicationChannel")
+            .value(hasSize(tonyStark().communicationChannels().size())));
   }
 
   @Test
@@ -75,12 +75,11 @@ class FreelancersApiTest {
         .when()
         .freelancer(invalidFreelancer()).registered()
         .then()
-        .response()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/validation-error.html")
-        .jsonPath("errors").isArray()
-        .jsonPath("errors").isNotEmpty();
+        .result()
+        .contains(status().isBadRequest())
+        .contains(jsonPath("type").value(endsWith("/probs/validation-error.html")))
+        .contains(jsonPath("errors").isArray())
+        .contains(jsonPath("errors").isNotEmpty());
   }
 
   @Test
@@ -90,10 +89,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(tonyStark()).retrieved()
         .then()
-        .response()
-        .expectStatus().isOk()
-        .expectBody()
-        .jsonPath("firstName").isEqualTo("Tony");
+        .result()
+        .contains(status().isOk())
+        .contains(jsonPath("firstName").value("Tony"));
   }
 
   @Test
@@ -102,10 +100,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(unregistered()).retrieved()
         .then()
-        .response()
-        .expectStatus().isNotFound()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isNotFound())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   @Test
@@ -116,14 +113,13 @@ class FreelancersApiTest {
         .freelancer(tonyStark()).movesTo(steveRogers().address())
         .then()
         .freelancers()
-        .expectBody()
-        .jsonPath("_embedded.freelancers[0].address.street").isEqualTo(steveRogers().address().street())
-        .jsonPath("_embedded.freelancers[0].address.apartment")
-        .isEqualTo(steveRogers().address().apartment().orElseThrow())
-        .jsonPath("_embedded.freelancers[0].address.city").isEqualTo(steveRogers().address().city())
-        .jsonPath("_embedded.freelancers[0].address.state").isEqualTo(steveRogers().address().state())
-        .jsonPath("_embedded.freelancers[0].address.zipCode").isEqualTo(steveRogers().address().zipCode())
-        .jsonPath("_embedded.freelancers[0].address.country").isEqualTo(steveRogers().address().country());
+        .contains(jsonPath("_embedded.freelancers[0].address.street").value(steveRogers().address().street()))
+        .contains(jsonPath("_embedded.freelancers[0].address.apartment")
+            .value(steveRogers().address().apartment().orElseThrow()))
+        .contains(jsonPath("_embedded.freelancers[0].address.city").value(steveRogers().address().city()))
+        .contains(jsonPath("_embedded.freelancers[0].address.state").value(steveRogers().address().state()))
+        .contains(jsonPath("_embedded.freelancers[0].address.zipCode").value(steveRogers().address().zipCode()))
+        .contains(jsonPath("_embedded.freelancers[0].address.country").value(steveRogers().address().country()));
   }
 
   @Test
@@ -132,10 +128,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(unregistered()).movesTo(steveRogers().address())
         .then()
-        .response()
-        .expectStatus().isNotFound()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isNotFound())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   @Test
@@ -146,10 +141,9 @@ class FreelancersApiTest {
         .freelancer(tonyStark()).addsCommunicationChannel(mobile("901-234-8765"))
         .then()
         .freelancers()
-        .expectBody()
-        .jsonPath("_embedded.freelancers[0].communicationChannels.length()").value(is(greaterThan(1)))
-        .jsonPath("_embedded.freelancers[0].communicationChannels.[*].value").value(hasItem("901-234-8765"))
-        .jsonPath("_embedded.freelancers[0].communicationChannels.[*].type").value(hasItem("MOBILE"));
+        .contains(jsonPath("_embedded.freelancers[0].communicationChannels.length()").value(is(greaterThan(1))))
+        .contains(jsonPath("_embedded.freelancers[0].communicationChannels.[*].value").value(hasItem("901-234-8765")))
+        .contains(jsonPath("_embedded.freelancers[0].communicationChannels.[*].type").value(hasItem("MOBILE")));
   }
 
   @Test
@@ -159,9 +153,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(tonyStark()).addsCommunicationChannel(mobile("901-234-8765"))
         .then()
-        .response()
-        .expectBody()
-        .jsonPath("_links.removeCommunicationChannel").value(hasSize(tonyStark().communicationChannels().size() + 1));
+        .result()
+        .contains(jsonPath("_links.removeCommunicationChannel")
+            .value(hasSize(tonyStark().communicationChannels().size() + 1)));
   }
 
   @Test
@@ -170,10 +164,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(unregistered()).addsCommunicationChannel(mobile("901-234-8765"))
         .then()
-        .response()
-        .expectStatus().isNotFound()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isNotFound())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   @Test
@@ -186,8 +179,8 @@ class FreelancersApiTest {
         .freelancer(tonyStark).removesCommunicationChannel(removedChannelId)
         .then()
         .freelancers()
-        .expectBody()
-        .jsonPath("_embedded.freelancers[0].communicationChannels[*].id").value(not(hasItem(removedChannelId)));
+        .contains(jsonPath("_embedded.freelancers[0].communicationChannels[*].id")
+            .value(not(hasItem(removedChannelId))));
   }
 
   @Test
@@ -202,9 +195,8 @@ class FreelancersApiTest {
         .freelancer(tonyStark).removesCommunicationChannel(channel1)
         .freelancer(tonyStark).removesCommunicationChannel(channel2)
         .then()
-        .response()
-        .expectBody()
-        .jsonPath("_links.removeCommunicationChannel").doesNotExist();
+        .result()
+        .contains(jsonPath("_links.removeCommunicationChannel").doesNotExist());
   }
 
   @Test
@@ -213,10 +205,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(unregistered()).removesCommunicationChannel(UUID.randomUUID().toString())
         .then()
-        .response()
-        .expectStatus().isNotFound()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isNotFound())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   @Test
@@ -226,10 +217,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(tonyStark()).removesCommunicationChannel(UUID.randomUUID().toString())
         .then()
-        .response()
-        .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isUnprocessableEntity())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   @Test
@@ -240,8 +230,7 @@ class FreelancersApiTest {
         .freelancer(tonyStark()).updatesNicknames("Ironman", "Tony", "Mr. Stark")
         .then()
         .freelancers()
-        .expectBody()
-        .jsonPath("_embedded.freelancers[0].nicknames").value(hasItems("Ironman", "Tony", "Mr. Stark"));
+        .contains(jsonPath("_embedded.freelancers[0].nicknames").value(hasItems("Ironman", "Tony", "Mr. Stark")));
   }
 
   @Test
@@ -250,10 +239,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(unregistered()).updatesNicknames("Ironman", "Tony")
         .then()
-        .response()
-        .expectStatus().isNotFound()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isNotFound())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   @Test
@@ -264,9 +252,8 @@ class FreelancersApiTest {
         .freelancer(tonyStark()).updatesWage(new HourlyWageDto(new BigDecimal("1000000"), "USD"))
         .then()
         .freelancers()
-        .expectBody()
-        .jsonPath("_embedded.freelancers[0].wage.amount").value(is(closeTo(1_000_000, 0)))
-        .jsonPath("_embedded.freelancers[0].wage.currency").isEqualTo("USD");
+        .contains(jsonPath("_embedded.freelancers[0].wage.amount").value(is(closeTo(1_000_000, 0))))
+        .contains(jsonPath("_embedded.freelancers[0].wage.currency").value("USD"));
   }
 
   @Test
@@ -275,10 +262,9 @@ class FreelancersApiTest {
         .when()
         .freelancer(unregistered()).updatesWage(new HourlyWageDto(new BigDecimal("1000000"), "USD"))
         .then()
-        .response()
-        .expectStatus().isNotFound()
-        .expectBody()
-        .jsonPath("type").isEqualTo("/probs/error.html");
+        .result()
+        .contains(status().isNotFound())
+        .contains(jsonPath("type").value(endsWith("/probs/error.html")));
   }
 
   private static FreelancerDto tonyStark() {

@@ -1,12 +1,12 @@
 package io.github.krloxz.fws.test;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.stream.Stream;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.stereotype.Component;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 
@@ -22,10 +22,12 @@ import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 public class FwsApplicationInitializers implements ApplicationContextAware {
 
   private ApplicationContext context;
+  private FwsApplicationRestApi restApi;
 
   @Override
   public void setApplicationContext(final ApplicationContext context) {
     this.context = context;
+    this.restApi = context.getBean(FwsApplicationRestApi.class);
   }
 
   /**
@@ -44,12 +46,7 @@ public class FwsApplicationInitializers implements ApplicationContextAware {
    */
   public FwsApplicationInitializers freelancers(final FreelancerDto... dtos) {
     Stream.of(dtos).forEach(
-        dto -> this.context.getBean(WebTestClient.class).post()
-            .uri("/freelancers")
-            .accept(MediaTypes.HAL_JSON)
-            .bodyValue(dto)
-            .exchange()
-            .expectBody(Void.class));
+        dto -> this.restApi.post("/freelancers", dto).andExpect(status().isCreated()));
     return this;
   }
 

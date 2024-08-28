@@ -3,17 +3,29 @@ package io.github.krloxz.fws.test;
 import org.springframework.stereotype.Component;
 
 /**
- * The FwsApplication encapsulated to test its functionalities using a DSL that attempts to resemble
- * the Gherkin language:
+ * The FwsApplication encapsulated to be tested using a DSL that attempts to resemble the Gherkin
+ * language:
  *
  * <pre>
- * this.fwsApplication.running()
- *     .when()
- *     .freelancers(tonyStark(), steveRogers()).registered()
- *     .then()
- *     .freelancers()
- *     .extracting(FreelancerDto::firstName)
- *     .contains("Tony", "Steve");
+ * {@code @Test}
+ * void registersFreelancers() {
+ *   this.fwsApplication.running()
+ *       .when()
+ *       .freelancer(tonyStark()).registered()
+ *       .freelancer(steveRogers()).registered()
+ *       .then()
+ *       .freelancers()
+ *       .contains(jsonPath("_embedded.freelancers[*].firstName").value(hasItems("Tony", "Steve")));
+ * }
+ * </pre>
+ *
+ * The previous test case is equivalent to the following Gherkin scenario:
+ *
+ * <pre>
+ * Scenario: Registering freelancers
+ *   Given that the FwsApplication is running
+ *   When the freelancers Tony Stark and Steve Rogers are registered
+ *   Then the names of the freelancers registered in the system should contain Tony and Steve
  * </pre>
  *
  * @author Carlos Gomez
