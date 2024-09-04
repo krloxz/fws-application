@@ -27,24 +27,22 @@ To build the project, run the following command:
 
 The unit tests are designed to support refactoring and are decoupled from implementation classes as much as possible. They test relevant business scenarios end to end and provide a high level of code coverage.
 
-The unit tests are written using [JUnit 5](https://junit.org/junit5/) and a DSL developed for the system.
+The unit tests are written using [JUnit 5](https://junit.org/junit5/) and the Gherking DSL framework.
 
-This DSL encapsulates the system functionalities and its side effects in a fluent interface that allows the developer to write expressive tests. For example, the following test checks if the system is able to register freelancers:
+The Gherkin DSL is a custom framework that encapsulates the system functionalities and its side effects in a fluent interface, which allows the developer to write more expressive tests. For example, the following test checks if the system is able to register freelancers:
 
 ```java
   @Test
   void registersFreelancers() {
-    this.fwsApplication.running()
-        .when()
-        .freelancer(tonyStark()).registered()
-        .freelancer(steveRogers()).registered()
-        .then()
-        .freelancers()
+    given(systemReady())
+        .when(freelancer(tonyStark()).registered())
+        .and(freelancer(steveRogers()).registered())
+        .then(freelancers().collection())
         .contains(jsonPath("_embedded.freelancers[*].firstName").value(hasItems("Tony", "Steve")));
   }
 ```
 
-The intent is to make the tests more readable and maintainable, while avoiding the fragility of traditional unit tests that are coupled to implementation classes and use mocks and stubs. Look at the [FreelancersApiTest](src/test/java/io/github/krloxz/fws/FreelancersApiTest.java) class to see more examples of tests written using the DSL.
+The intent is to make the project tests more readable and maintainable while avoiding the fragility of traditional unit tests, which are commonly coupled to implementation classes and have to rely on mocks and stubs. Look at the [FreelancersApiTest](src/test/java/io/github/krloxz/fws/freelancer/FreelancersApiTest.java) and [TestScenario](src/test/java/io/github/krloxz/fws/test/gherkin/TestScenario.java) classes to see more examples of tests written using the Gherkin DSL.
 
 Use the following command to run the unit tests:
 

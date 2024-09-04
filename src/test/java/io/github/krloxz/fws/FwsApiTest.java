@@ -1,12 +1,15 @@
 package io.github.krloxz.fws;
 
+import static io.github.krloxz.fws.test.gherkin.TestScenario.given;
+import static io.github.krloxz.fws.test.gherkin.actions.Actions.response;
+import static io.github.krloxz.fws.test.gherkin.actions.Actions.systemReady;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import io.github.krloxz.fws.test.FwsApplicationRestApi;
 import io.github.krloxz.fws.test.FwsApplicationTest;
+import io.github.krloxz.fws.test.gherkin.restapi.RestApiAction;
 
 /**
  * Tests access to the Freelancer Web Services (FWS) API.
@@ -16,12 +19,18 @@ import io.github.krloxz.fws.test.FwsApplicationTest;
 @FwsApplicationTest
 class FwsApiTest {
 
-  @Autowired
-  private FwsApplicationRestApi restApi;
-
   @Test
   void listResources() {
-    this.restApi.get("/").andExpect(status().isOk());
+    given(systemReady())
+        .when(rootUrlRequested())
+        .then(response())
+        .contains(status().isOk())
+        .contains(jsonPath("_links.self.href").value("http://localhost/"))
+        .contains(jsonPath("_links.freelancers.href").value("http://localhost/freelancers"));
+  }
+
+  private RestApiAction rootUrlRequested() {
+    return restApi -> restApi.get("/");
   }
 
 }

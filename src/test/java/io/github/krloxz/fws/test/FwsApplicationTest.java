@@ -11,9 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
+import io.github.krloxz.fws.test.gherkin.GherkinConfig;
+
 /**
- * Indicates that a class implements test cases for the FwsApplication and ensures that the Spring
- * context contains a {@link TestFwsApplication} ready for use.
+ * Indicates that a class implements tests for the FwsApplication and ensures that the application
+ * is properly configured for testing.
  *
  * @author Carlos Gomez
  */
@@ -21,9 +23,9 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
-@ExtendWith(DatabaseCleaner.class)
-@Import(TestFwsApplicationConfig.class)
 @AutoConfigureMockMvc
+@ExtendWith(DatabaseCleaner.class)
+@Import({TestFwsApplicationConfig.class, GherkinConfig.class})
 public @interface FwsApplicationTest {
 
 }

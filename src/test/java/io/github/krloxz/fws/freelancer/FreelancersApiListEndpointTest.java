@@ -1,25 +1,16 @@
-package io.github.krloxz.fws;
+package io.github.krloxz.fws.freelancer;
 
+import static io.github.krloxz.fws.freelancer.FreelancerActions.freelancer;
+import static io.github.krloxz.fws.freelancer.FreelancerActions.freelancers;
+import static io.github.krloxz.fws.test.gherkin.TestScenario.given;
+import static io.github.krloxz.fws.test.gherkin.actions.Actions.response;
+import static io.github.krloxz.fws.test.gherkin.actions.Actions.systemReady;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import io.github.krloxz.fws.freelancer.application.dtos.AddressDtoBuilder;
-import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
-import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDtoBuilder;
-import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
-import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDtoBuilder;
-import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
-import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
-import io.github.krloxz.fws.freelancer.domain.Gender;
 import io.github.krloxz.fws.test.FwsApplicationTest;
-import io.github.krloxz.fws.test.TestFwsApplication;
 
 /**
  * Tests the list endpoint of the Freelancers API.
@@ -29,24 +20,17 @@ import io.github.krloxz.fws.test.TestFwsApplication;
 @FwsApplicationTest
 class FreelancersApiListEndpointTest {
 
-  @Autowired
-  private TestFwsApplication fwsApplication;
-
   @Test
   void listsRandomPage() {
-    this.fwsApplication.runningWith()
-        .freelancers(
-            freelancer("Bruce", "Banner"),
-            freelancer("Clint", "Barton"),
-            freelancer("Thor", "Odinson"),
-            freelancer("Steve", "Rogers"),
-            freelancer("Natasha", "Romanoff"),
-            freelancer("Tony", "Stark"),
-            freelancer("Stephen", "Strange"))
-        .when()
-        .freelancers().listed(1, 3)
-        .then()
-        .result()
+    given(freelancer("Bruce", "Banner").registered())
+        .and(freelancer("Clint", "Barton").registered())
+        .and(freelancer("Thor", "Odinson").registered())
+        .and(freelancer("Steve", "Rogers").registered())
+        .and(freelancer("Natasha", "Romanoff").registered())
+        .and(freelancer("Tony", "Stark").registered())
+        .and(freelancer("Stephen", "Strange").registered())
+        .when(freelancers().listed(1, 3))
+        .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_embedded.freelancers.length()").value(3))
         .contains(jsonPath("_embedded.freelancers[0].firstName").value("Steve"))
@@ -66,19 +50,15 @@ class FreelancersApiListEndpointTest {
 
   @Test
   void listsFirstPage() {
-    this.fwsApplication.runningWith()
-        .freelancers(
-            freelancer("Bruce", "Banner"),
-            freelancer("Clint", "Barton"),
-            freelancer("Thor", "Odinson"),
-            freelancer("Steve", "Rogers"),
-            freelancer("Natasha", "Romanoff"),
-            freelancer("Tony", "Stark"),
-            freelancer("Stephen", "Strange"))
-        .when()
-        .freelancers().listed(0, 3)
-        .then()
-        .result()
+    given(freelancer("Bruce", "Banner").registered())
+        .and(freelancer("Clint", "Barton").registered())
+        .and(freelancer("Thor", "Odinson").registered())
+        .and(freelancer("Steve", "Rogers").registered())
+        .and(freelancer("Natasha", "Romanoff").registered())
+        .and(freelancer("Tony", "Stark").registered())
+        .and(freelancer("Stephen", "Strange").registered())
+        .when(freelancers().listed(0, 3))
+        .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_embedded.freelancers.length()").value(3))
         .contains(jsonPath("_embedded.freelancers[0].firstName").value("Bruce"))
@@ -98,19 +78,15 @@ class FreelancersApiListEndpointTest {
 
   @Test
   void listsLastPage() {
-    this.fwsApplication.runningWith()
-        .freelancers(
-            freelancer("Bruce", "Banner"),
-            freelancer("Clint", "Barton"),
-            freelancer("Thor", "Odinson"),
-            freelancer("Steve", "Rogers"),
-            freelancer("Natasha", "Romanoff"),
-            freelancer("Tony", "Stark"),
-            freelancer("Stephen", "Strange"))
-        .when()
-        .freelancers().listed(2, 3)
-        .then()
-        .result()
+    given(freelancer("Bruce", "Banner").registered())
+        .and(freelancer("Clint", "Barton").registered())
+        .and(freelancer("Thor", "Odinson").registered())
+        .and(freelancer("Steve", "Rogers").registered())
+        .and(freelancer("Natasha", "Romanoff").registered())
+        .and(freelancer("Tony", "Stark").registered())
+        .and(freelancer("Stephen", "Strange").registered())
+        .when(freelancers().listed(2, 3))
+        .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_embedded.freelancers.length()").value(1))
         .contains(jsonPath("_embedded.freelancers[0].firstName").value("Stephen"))
@@ -128,14 +104,10 @@ class FreelancersApiListEndpointTest {
 
   @Test
   void listsSinglePage() {
-    this.fwsApplication.runningWith()
-        .freelancers(
-            freelancer("Bruce", "Banner"),
-            freelancer("Clint", "Barton"))
-        .when()
-        .freelancers().listed(0, 3)
-        .then()
-        .result()
+    given(freelancer("Bruce", "Banner").registered())
+        .and(freelancer("Clint", "Barton").registered())
+        .when(freelancers().listed(0, 3))
+        .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_embedded.freelancers.length()").value(2))
         .contains(jsonPath("_embedded.freelancers[0].firstName").value("Bruce"))
@@ -154,12 +126,9 @@ class FreelancersApiListEndpointTest {
 
   @Test
   void listsEmptyPage() {
-    this.fwsApplication.runningWith()
-        .freelancers()
-        .when()
-        .freelancers().listed(0, 3)
-        .then()
-        .result()
+    given(systemReady())
+        .when(freelancers().listed(0, 3))
+        .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_embedded.freelancers").doesNotExist())
         .contains(jsonPath("_links.register.href").isNotEmpty())
@@ -177,19 +146,15 @@ class FreelancersApiListEndpointTest {
   @Test
   void listsDefaultPageWithDefaultSize() {
     final var defaultPageSize = 5;
-    this.fwsApplication.runningWith()
-        .freelancers(
-            freelancer("Bruce", "Banner"),
-            freelancer("Clint", "Barton"),
-            freelancer("Thor", "Odinson"),
-            freelancer("Steve", "Rogers"),
-            freelancer("Natasha", "Romanoff"),
-            freelancer("Tony", "Stark"),
-            freelancer("Stephen", "Strange"))
-        .when()
-        .freelancers().listed()
-        .then()
-        .result()
+    given(freelancer("Bruce", "Banner").registered())
+        .and(freelancer("Clint", "Barton").registered())
+        .and(freelancer("Thor", "Odinson").registered())
+        .and(freelancer("Steve", "Rogers").registered())
+        .and(freelancer("Natasha", "Romanoff").registered())
+        .and(freelancer("Tony", "Stark").registered())
+        .and(freelancer("Stephen", "Strange").registered())
+        .when(freelancers().listed())
+        .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_embedded.freelancers.length()").value(defaultPageSize))
         .contains(jsonPath("_links.register.href").isNotEmpty())
@@ -209,34 +174,5 @@ class FreelancersApiListEndpointTest {
   // https://docs.spring.io/spring-data/rest/reference/paging-and-sorting.html#paging-and-sorting.sorting
   // failsToListWithInvalidPageSize
   // failsToListInvalidPage
-
-  private static FreelancerDto freelancer(final String firstName, final String lastName) {
-    return new FreelancerDtoBuilder()
-        .firstName(firstName)
-        .lastName(lastName)
-        .gender(Gender.MALE)
-        .birthDate(LocalDate.parse("1970-01-01"))
-        .address(
-            new AddressDtoBuilder()
-                .street("123 Main St")
-                .apartment("Apt 1A")
-                .city("Anytown")
-                .state("NY")
-                .zipCode("12345")
-                .country("USA")
-                .build())
-        .wage(new HourlyWageDto(new BigDecimal("30"), "USD"))
-        .addNickname(firstName + " Nickname")
-        .addCommunicationChannel(email(firstName + "@email.com"))
-        .build();
-  }
-
-  private static CommunicationChannelDto email(final String email) {
-    return new CommunicationChannelDtoBuilder()
-        .id(UUID.randomUUID().toString())
-        .value(email)
-        .type(CommunicationChannel.Type.EMAIL)
-        .build();
-  }
 
 }
