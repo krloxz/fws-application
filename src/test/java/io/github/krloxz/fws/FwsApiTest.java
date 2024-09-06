@@ -26,7 +26,8 @@ class FwsApiTest {
         .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_links.self.href").value("http://localhost/"))
-        .contains(jsonPath("_links.freelancers.href").value("http://localhost/freelancers"));
+        .contains(jsonPath("_links.freelancers.href").value("http://localhost/freelancers"))
+        .contains(jsonPath("_links.projects.href").value("http://localhost/projects"));
   }
 
   private RestApiAction rootUrlRequested() {

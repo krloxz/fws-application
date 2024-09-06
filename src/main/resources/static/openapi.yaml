@@ -35,6 +35,8 @@ paths:
                         $ref: "#/components/schemas/Link"
                       freelancers:
                         $ref: "#/components/schemas/Link"
+                      projects:
+                        $ref: "#/components/schemas/Link"
         default:
           $ref: "#/components/responses/Error"
 
@@ -94,20 +96,7 @@ paths:
                       last:
                         $ref: "#/components/schemas/Link"
                   page:
-                    type: object
-                    properties:
-                      size:
-                        type: integer
-                        example: 20
-                      totalElements:
-                        type: integer
-                        example: 1
-                      totalPages:
-                        type: integer
-                        example: 1
-                      number:
-                        type: integer
-                        example: 0
+                    $ref: "#/components/schemas/Page"
         default:
           $ref: "#/components/responses/Error"
     post:
@@ -289,6 +278,108 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /projects:
+    get:
+      tags:
+        - Projects
+      description: Returns a paginated list of projects.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: 0-based page number to list
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: Number of elements per page
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                required:
+                  - _embedded
+                  - _links
+                properties:
+                  _embedded:
+                    type: object
+                    required:
+                      - projects
+                    properties:
+                      projects:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Project"
+                  _links:
+                    type: object
+                    required:
+                      - self
+                      - create
+                    properties:
+                      self:
+                        $ref: "#/components/schemas/Link"
+                      create:
+                        $ref: "#/components/schemas/Link"
+                      first:
+                        $ref: "#/components/schemas/Link"
+                      prev:
+                        $ref: "#/components/schemas/Link"
+                      next:
+                        $ref: "#/components/schemas/Link"
+                      last:
+                        $ref: "#/components/schemas/Link"
+                  page:
+                    $ref: "#/components/schemas/Page"
+        default:
+          $ref: "#/components/responses/Error"
+    post:
+      tags:
+        - Projects
+      description: Creates a new project.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+      responses:
+        "201":
+          description: Project was created.
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /projects/{id}:
+    get:
+      tags:
+        - Projects
+      description: Retrieves a project by its ID.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of a project already created.
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/Error"
+
 components:
   schemas:
     Freelancer:
@@ -439,6 +530,51 @@ components:
       required:
         - value
         - type
+    Project:
+      type: object
+      description: Information about a project
+      properties:
+        id:
+          type: string
+          nullable: true
+          description: Unique identifier for the project
+          example: "fa8508ed-8b7b-4be7-b372-ac1094c709b5"
+        name:
+          type: string
+          description: Name of the project
+          example: "Avengers"
+        description:
+          type: string
+          description: Description of the project
+          example: "Earth's mightiest heroes"
+        _links:
+          type: object
+          description: Links for subresources and actions available for the project
+          required:
+            - self
+          properties:
+            collection:
+              $ref: "#/components/schemas/Link"
+            self:
+              $ref: "#/components/schemas/Link"
+      required:
+        - name
+        - description
+    Page:
+      type: object
+      properties:
+        size:
+          type: integer
+          example: 20
+        totalElements:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 1
+        number:
+          type: integer
+          example: 0
     Link:
       type: object
       description: Link to a resource or action
@@ -446,7 +582,7 @@ components:
         href:
           type: string
           description: URI of the resource or action
-          example: "freelancers/fa8508ed-8b7b-4be7-b372-ac1094c709b5"
+          example: "/collection-name/resource-id"
         method:
           type: string
           description: HTTP method for the link

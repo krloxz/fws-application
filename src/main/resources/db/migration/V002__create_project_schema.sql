@@ -1,0 +1,7 @@
+CREATE SCHEMA IF NOT EXISTS project;
+
+CREATE TABLE IF NOT EXISTS project.projects(
+  id UUID PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL
+);

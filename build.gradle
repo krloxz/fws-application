@@ -87,6 +87,10 @@ jooq {
                 inputSchema = 'freelancer'
                 outputSchema = 'freelancer'
               }
+              schema {
+                inputSchema = 'project'
+                outputSchema = 'project'
+              }
             }
             properties {
               property {

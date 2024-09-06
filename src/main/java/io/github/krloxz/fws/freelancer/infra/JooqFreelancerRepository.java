@@ -1,8 +1,8 @@
 package io.github.krloxz.fws.freelancer.infra;
 
-import static io.github.krloxz.fws.infra.jooq.Tables.ADDRESSES;
-import static io.github.krloxz.fws.infra.jooq.Tables.COMMUNICATION_CHANNELS;
-import static io.github.krloxz.fws.infra.jooq.Tables.FREELANCERS;
+import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.ADDRESSES;
+import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.COMMUNICATION_CHANNELS;
+import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.FREELANCERS;
 
 import java.util.List;
 import java.util.Optional;

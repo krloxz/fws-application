@@ -38,7 +38,7 @@ import io.github.krloxz.fws.freelancer.domain.PageSpec;
  */
 @Transactional
 @RestController
-@RequestMapping("freelancers")
+@RequestMapping("/freelancers")
 public class FreelancersApiController {
 
   private final FreelancerRepository repository;
