@@ -68,7 +68,9 @@ dependencies {
 
   // Spring Modulith
   implementation 'org.springframework.modulith:spring-modulith-starter-core'
+  implementation 'org.jmolecules.integrations:jmolecules-starter-ddd'
   testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
+  testImplementation 'org.jmolecules.integrations:jmolecules-archunit'
 
   // Testing
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -78,6 +80,7 @@ dependencies {
 dependencyManagement {
   imports {
     mavenBom 'org.springframework.modulith:spring-modulith-bom:1.2.3'
+    mavenBom 'org.jmolecules:jmolecules-bom:2023.1.4'
   }
 }
 

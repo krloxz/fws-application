@@ -8,12 +8,15 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.immutables.value.Value;
+import org.jmolecules.ddd.annotation.AggregateRoot;
+import org.jmolecules.ddd.annotation.Identity;
 
 /**
  * Represents a freelancer.
  *
  * @author Carlos Gomez
  */
+@AggregateRoot
 @Value.Immutable
 @Value.Style(depluralize = true)
 public abstract class Freelancer {
@@ -21,6 +24,7 @@ public abstract class Freelancer {
   /**
    * @return the unique identifier of this freelancer
    */
+  @Identity
   public abstract UUID id();
 
   /**
