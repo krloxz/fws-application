@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.github.krloxz.fws.common.PageSpec;
+
 /**
  * Repository for freelancers.
  *

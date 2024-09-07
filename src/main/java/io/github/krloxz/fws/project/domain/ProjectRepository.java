@@ -3,7 +3,7 @@ package io.github.krloxz.fws.project.domain;
 import java.util.List;
 import java.util.Optional;
 
-import io.github.krloxz.fws.freelancer.domain.PageSpec;
+import io.github.krloxz.fws.common.PageSpec;
 
 /**
  * Repository for projects.

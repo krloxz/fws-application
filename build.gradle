@@ -66,15 +66,24 @@ dependencies {
   // PlantUML
   plantuml 'net.sourceforge.plantuml:plantuml-gplv2:1.2024.6'
 
+  // Spring Modulith
+  implementation 'org.springframework.modulith:spring-modulith-starter-core'
+  testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
+
   // Testing
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
-  testImplementation 'io.projectreactor:reactor-test'
   testImplementation 'com.atlassian.oai:swagger-request-validator-mockmvc:2.41.0'
+}
+
+dependencyManagement {
+  imports {
+    mavenBom 'org.springframework.modulith:spring-modulith-bom:1.2.3'
+  }
 }
 
 jooq {
   configurations {
-    main {
+    freelancer {
       generationTool {
         logging = org.jooq.meta.jaxb.Logging.WARN
         jdbc = null
@@ -87,6 +96,47 @@ jooq {
                 inputSchema = 'freelancer'
                 outputSchema = 'freelancer'
               }
+            }
+            properties {
+              property {
+                key = 'scripts'
+                value = "${projectDir}/src/*/resources/db/migration/*.sql"
+              }
+              property {
+                key = 'sort'
+                value = 'flyway'
+              }
+              property {
+                key = 'unqualifiedSchema'
+                value = 'none'
+              }
+              property {
+                key = 'defaultNameCase'
+                value = 'lower'
+              }
+            }
+          }
+          generate {
+            relations = true
+            records = true
+            fluentSetters = true
+          }
+          target {
+            packageName = 'io.github.krloxz.fws.freelancer.infra.jooq'
+            directory = 'build/generated/sources/jooq/freelancer'
+          }
+        }
+      }
+    }
+    project {
+      generationTool {
+        logging = org.jooq.meta.jaxb.Logging.WARN
+        jdbc = null
+        generator {
+          name = 'org.jooq.codegen.DefaultGenerator'
+          database {
+            name = 'org.jooq.meta.extensions.ddl.DDLDatabase'
+            schemata {
               schema {
                 inputSchema = 'project'
                 outputSchema = 'project'
@@ -117,8 +167,8 @@ jooq {
             fluentSetters = true
           }
           target {
-            packageName = 'io.github.krloxz.fws.infra.jooq'
-            directory = 'build/generated/sources/jooq'
+            packageName = 'io.github.krloxz.fws.project.infra.jooq'
+            directory = 'build/generated/sources/jooq/project'
           }
         }
       }
@@ -126,8 +176,20 @@ jooq {
   }
 }
 
+// wire JOOQ sources into the main Java source set
+sourceSets.main.java.srcDirs (
+  tasks.named('generateFreelancerJooq').flatMap { it.outputDir },
+  tasks.named('generateProjectJooq').flatMap { it.outputDir }
+)
+
+tasks.register('generateJooq') {
+  group = 'JOOQ'
+  description = 'Generates all the jOOQ sources.'
+  dependsOn 'generateFreelancerJooq', 'generateProjectJooq'
+}
+
 eclipse {
-  synchronizationTasks generateJooq
+  synchronizationTasks 'generateJooq'
   classpath {
     downloadSources = true
   }
@@ -169,5 +231,5 @@ tasks.register('diagrams', JavaExec) {
   inputs.files fileTree(dir: "${projectDir}/docs", include: '**/*.puml')
   outputs.dir "${projectDir}/docs/images"
   outputs.dir "${projectDir}/docs/structurizr/.generated"
-  dependsOn structurizrCliExport
+  dependsOn 'structurizrCliExport'
 }

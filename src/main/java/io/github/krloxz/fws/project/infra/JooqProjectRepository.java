@@ -1,6 +1,6 @@
 package io.github.krloxz.fws.project.infra;
 
-import static io.github.krloxz.fws.infra.jooq.project.Tables.PROJECTS;
+import static io.github.krloxz.fws.project.infra.jooq.Tables.PROJECTS;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.github.krloxz.fws.freelancer.domain.PageSpec;
+import io.github.krloxz.fws.common.PageSpec;
 import io.github.krloxz.fws.project.domain.Project;
 import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.domain.ProjectRepository;

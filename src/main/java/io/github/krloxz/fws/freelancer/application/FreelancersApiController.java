@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.github.krloxz.fws.common.PageSpec;
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
-import io.github.krloxz.fws.freelancer.domain.PageSpec;
 
 /**
  * Restful controller that exposes the Freelancers API.

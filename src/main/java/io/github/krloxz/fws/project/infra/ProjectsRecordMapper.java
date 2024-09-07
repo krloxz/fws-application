@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import org.mapstruct.Mapper;
 
-import io.github.krloxz.fws.infra.jooq.project.tables.records.ProjectsRecord;
 import io.github.krloxz.fws.project.domain.Project;
 import io.github.krloxz.fws.project.domain.ProjectId;
+import io.github.krloxz.fws.project.infra.jooq.tables.records.ProjectsRecord;
 
 /**
  * Maps {@link Project} instances between the JOOQ record and domain models.

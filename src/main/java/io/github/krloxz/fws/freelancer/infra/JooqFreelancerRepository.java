@@ -1,8 +1,8 @@
 package io.github.krloxz.fws.freelancer.infra;
 
-import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.ADDRESSES;
-import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.COMMUNICATION_CHANNELS;
-import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.FREELANCERS;
+import static io.github.krloxz.fws.freelancer.infra.jooq.Tables.ADDRESSES;
+import static io.github.krloxz.fws.freelancer.infra.jooq.Tables.COMMUNICATION_CHANNELS;
+import static io.github.krloxz.fws.freelancer.infra.jooq.Tables.FREELANCERS;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +17,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.krloxz.fws.common.PageSpec;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
-import io.github.krloxz.fws.freelancer.domain.PageSpec;
 
 /**
  * JOOQ implementation of the {@link FreelancerRepository}.

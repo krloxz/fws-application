@@ -1,4 +1,4 @@
-package io.github.krloxz.fws.freelancer.domain;
+package io.github.krloxz.fws.common;
 
 /**
  * Specification for a page of items to be retrieved.

@@ -1,6 +1,6 @@
 package io.github.krloxz.fws.project.application;
 
-import static io.github.krloxz.fws.springframework.AffordanceLink.affordanceLinkTo;
+import static io.github.krloxz.fws.common.AffordanceLink.affordanceLinkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.springframework.data.domain.Page;
@@ -13,7 +13,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
-import io.github.krloxz.fws.springframework.AffordanceLink;
+import io.github.krloxz.fws.common.AffordanceLink;
 
 /**
  * Assembles {@link ProjectDto} instances into {@link EntityModel} instances.

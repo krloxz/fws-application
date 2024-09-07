@@ -1,6 +1,6 @@
 package io.github.krloxz.fws.freelancer.application;
 
-import static io.github.krloxz.fws.springframework.AffordanceLink.affordanceLinkTo;
+import static io.github.krloxz.fws.common.AffordanceLink.affordanceLinkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.Optional;
@@ -16,9 +16,9 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import io.github.krloxz.fws.common.AffordanceLink;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
-import io.github.krloxz.fws.springframework.AffordanceLink;
 
 /**
  * {@link RepresentationModelAssembler} that converts {@link FreelancerDto}'s into

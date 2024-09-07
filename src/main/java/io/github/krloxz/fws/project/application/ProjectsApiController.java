@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.github.krloxz.fws.freelancer.domain.PageSpec;
+import io.github.krloxz.fws.common.PageSpec;
 import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.domain.ProjectRepository;
 

@@ -1,8 +1,8 @@
 package io.github.krloxz.fws.freelancer.infra;
 
-import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.ADDRESSES;
-import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.COMMUNICATION_CHANNELS;
-import static io.github.krloxz.fws.infra.jooq.freelancer.Tables.FREELANCERS;
+import static io.github.krloxz.fws.freelancer.infra.jooq.Tables.ADDRESSES;
+import static io.github.krloxz.fws.freelancer.infra.jooq.Tables.COMMUNICATION_CHANNELS;
+import static io.github.krloxz.fws.freelancer.infra.jooq.Tables.FREELANCERS;
 import static java.util.stream.Collectors.joining;
 
 import java.util.List;
@@ -18,9 +18,9 @@ import org.mapstruct.Mapping;
 import io.github.krloxz.fws.freelancer.domain.CommunicationChannel;
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.Gender;
-import io.github.krloxz.fws.infra.jooq.freelancer.tables.records.AddressesRecord;
-import io.github.krloxz.fws.infra.jooq.freelancer.tables.records.CommunicationChannelsRecord;
-import io.github.krloxz.fws.infra.jooq.freelancer.tables.records.FreelancersRecord;
+import io.github.krloxz.fws.freelancer.infra.jooq.tables.records.AddressesRecord;
+import io.github.krloxz.fws.freelancer.infra.jooq.tables.records.CommunicationChannelsRecord;
+import io.github.krloxz.fws.freelancer.infra.jooq.tables.records.FreelancersRecord;
 
 /**
  * Maps {@link Freelancer}'s between the JOOQ record and domain models.
