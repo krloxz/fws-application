@@ -69,8 +69,10 @@ dependencies {
   // Spring Modulith
   implementation 'org.springframework.modulith:spring-modulith-starter-core'
   implementation 'org.jmolecules.integrations:jmolecules-starter-ddd'
+  implementation 'org.jmolecules:jmolecules-onion-architecture'
   testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
   testImplementation 'org.jmolecules.integrations:jmolecules-archunit'
+  testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
 
   // Testing
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
