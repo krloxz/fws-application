@@ -1,0 +1,49 @@
+@startuml
+set separator none
+title Freelancer Web Services - Containers
+
+top to bottom direction
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+}
+
+hide stereotype
+
+skinparam database<<FreelancerWebServices.Database>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam person<<Freelancer>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices>> {
+  BorderColor #9a9a9a
+  FontColor #9a9a9a
+  shadowing false
+}
+
+person "==Freelancer\n<size:10>[Person]</size>" <<Freelancer>> as Freelancer
+
+rectangle "Freelancer Web Services\n<size:10>[Software System]</size>" <<FreelancerWebServices>> {
+  rectangle "==FWS Application\n<size:10>[Container: Spring Boot]</size>\n\nProvides web services for freelancers to manage their work, projects and customers" <<FreelancerWebServices.FWSApplication>> as FreelancerWebServices.FWSApplication
+  database "==Database\n<size:10>[Container: H2 Database]</size>\n\nStores freelancers, projects, customers and billing data" <<FreelancerWebServices.Database>> as FreelancerWebServices.Database
+}
+
+Freelancer .[#707070,thickness=2].> FreelancerWebServices.FWSApplication : "<color:#707070>Manages work using\n<color:#707070><size:8>[JSON/HTTPS]</size>"
+FreelancerWebServices.FWSApplication .[#707070,thickness=2].> FreelancerWebServices.Database : "<color:#707070>Reads from and writes to\n<color:#707070><size:8>[JDBC]</size>"
+@enduml

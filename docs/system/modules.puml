@@ -1,0 +1,58 @@
+@startuml
+set separator none
+title Freelancer Web Services - Modules
+
+top to bottom direction
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+}
+
+hide stereotype
+
+skinparam rectangle<<FreelancerWebServices.FWSApplication.BillingService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.CustomerService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.FreelancerService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.ProjectService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication>> {
+  BorderColor #9a9a9a
+  FontColor #9a9a9a
+  shadowing false
+}
+
+rectangle "FWS Application\n<size:10>[Container: Spring Boot]</size>" <<FreelancerWebServices.FWSApplication>> {
+  rectangle "==Freelancer Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their work" <<FreelancerWebServices.FWSApplication.FreelancerService>> as FreelancerWebServices.FWSApplication.FreelancerService
+  rectangle "==Project Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their projects" <<FreelancerWebServices.FWSApplication.ProjectService>> as FreelancerWebServices.FWSApplication.ProjectService
+  rectangle "==Customer Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their customers" <<FreelancerWebServices.FWSApplication.CustomerService>> as FreelancerWebServices.FWSApplication.CustomerService
+  rectangle "==Billing Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their billing" <<FreelancerWebServices.FWSApplication.BillingService>> as FreelancerWebServices.FWSApplication.BillingService
+}
+
+FreelancerWebServices.FWSApplication.FreelancerService .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.ProjectService : "<color:#707070>Reads project data from"
+FreelancerWebServices.FWSApplication.ProjectService .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.CustomerService : "<color:#707070>Reads customer data from"
+FreelancerWebServices.FWSApplication.BillingService .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.FreelancerService : "<color:#707070>Gets freelancer work data from"
+FreelancerWebServices.FWSApplication.BillingService .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.ProjectService : "<color:#707070>Reads project data from"
+FreelancerWebServices.FWSApplication.BillingService .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.CustomerService : "<color:#707070>Reads customer data from"
+@enduml

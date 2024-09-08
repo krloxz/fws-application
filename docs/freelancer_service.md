@@ -1,3 +1,0 @@
-# Freelancer Service
-
-TBD

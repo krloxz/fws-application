@@ -1,0 +1,19 @@
+@startuml
+set separator none
+title Freelancer Service
+
+top to bottom direction
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Component>
+
+Container_Boundary("FwsApplication.FwsApplication_boundary", "FwsApplication", $tags="") {
+  Component(FwsApplication.FwsApplication.Common, "Common", $techn="Module", $descr="", $tags="", $link="")
+  Component(FwsApplication.FwsApplication.FreelancerService, "Freelancer Service", $techn="Module", $descr="", $tags="", $link="")
+}
+
+Rel(FwsApplication.FwsApplication.FreelancerService, FwsApplication.FwsApplication.Common, "depends on", $techn="", $tags="", $link="")
+
+SHOW_LEGEND(true)
+@enduml

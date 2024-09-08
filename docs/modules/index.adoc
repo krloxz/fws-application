@@ -1,0 +1,16 @@
+== FwsApplication
+image::components.png[]
+
+== Common
+image::module-common.png[]
+include::module-common.adoc[]
+
+== Project Service
+image::module-project.png[]
+include::module-project.adoc[]
+
+== Freelancer Service
+image::module-freelancer.png[]
+include::module-freelancer.adoc[]
+
+

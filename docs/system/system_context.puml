@@ -1,0 +1,33 @@
+@startuml
+set separator none
+title Freelancer Web Services - System Context
+
+top to bottom direction
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+}
+
+hide stereotype
+
+skinparam person<<Freelancer>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+
+person "==Freelancer\n<size:10>[Person]</size>" <<Freelancer>> as Freelancer
+rectangle "==Freelancer Web Services\n<size:10>[Software System]</size>\n\nProvides web services for freelancers to manage their work, projects and customers" <<FreelancerWebServices>> as FreelancerWebServices
+
+Freelancer .[#707070,thickness=2].> FreelancerWebServices : "<color:#707070>Manages work using\n<color:#707070><size:8>[JSON/HTTPS]</size>"
+@enduml

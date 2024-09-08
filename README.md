@@ -60,10 +60,10 @@ The application will start on port 8080. You can access the root URL at [http://
 
 ## Generating the Documentation
 
-The documentation is written in Markdown and can be found in the `docs` directory.
+The project documentation is composed of static and dynamic documents that describe the system's domain, architecture, design and implementation. The static documents are written using [Markdown](https://www.markdownguide.org/cheat-sheet/), [AsciiDoc](https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/) and [PlantUML](https://plantuml.com/), while the dynamic documents are generated using [Spring Modulith](https://docs.spring.io/spring-modulith/reference/) and [Structurizr](https://docs.structurizr.com/).
 
-The project uses [Structurizr](https://docs.structurizr.com/) and [PlantUML](https://plantuml.com/) to generate diagrams that document the system's architecture and design. Run the following command to generate the diagrams:
+Run the following command to generate the dynamic documents:
 
-    ./gradlew diagrams
+    ./gradlew generateDocumentation
 
-The generated diagrams can be found in the directories `docs/structurizr/.generated` and `docs/images`.
+The generated documents will be placed in the `docs` directory alongside static documents. Both types of documents are committed to the repository.

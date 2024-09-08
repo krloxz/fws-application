@@ -2,7 +2,7 @@
 
 Freelancer Web Services (FWS) is an information system designed to handle complex business processes by integrating several architectural styles, the following picture offers an overview of how those styles are combined to create a reference architecture for the system:
 
-![Architecture Overview](images/architecture_overview.svg)
+![Reference Architecture](reference_architecture.png)
 
 
 ## Domain-Driven Design (DDD)

@@ -1,0 +1,15 @@
+== FwsApplication
+plantuml::components.puml[]
+
+== Common
+plantuml::module-common.puml[]
+include::module-common.adoc[]
+
+== Project Service
+plantuml::module-project.puml[]
+include::module-project.adoc[]
+
+== Freelancer Service
+plantuml::module-freelancer.puml[]
+include::module-freelancer.adoc[]
+

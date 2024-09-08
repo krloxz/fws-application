@@ -1,0 +1,20 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`io.github.krloxz.fws.freelancer`
+|Spring components
+|_Controllers_
+
+* `i.g.k.f.f.application.FreelancersApiController`
+
+_Repositories_
+
+* `i.g.k.f.f.domain.FreelancerRepository` (via `i.g.k.f.f.infra.JooqFreelancerRepository`)
+|Aggregate roots
+|* `i.g.k.f.f.domain.Freelancer`
+|Value types
+|* `i.g.k.f.f.domain.Address`
+* `i.g.k.f.f.domain.Gender`
+* `i.g.k.f.f.domain.HourlyWage`
+* `i.g.k.f.f.domain.PersonName`
+|===

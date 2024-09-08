@@ -1,0 +1,105 @@
+@startuml
+set separator none
+title Freelancer Web Services - Components
+
+top to bottom direction
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+}
+
+hide stereotype
+
+skinparam rectangle<<FreelancerWebServices.Database.Billing>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.BillingService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.CustomerService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.Database.Customers>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam person<<Freelancer>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.FreelancerService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.Database.Freelancers>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication.ProjectService>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.Database.Projects>> {
+  BackgroundColor #dddddd
+  FontColor #000000
+  BorderColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.FWSApplication>> {
+  BorderColor #9a9a9a
+  FontColor #9a9a9a
+  shadowing false
+}
+skinparam rectangle<<FreelancerWebServices.Database>> {
+  BorderColor #9a9a9a
+  FontColor #9a9a9a
+  shadowing false
+}
+
+person "==Freelancer\n<size:10>[Person]</size>" <<Freelancer>> as Freelancer
+
+rectangle "FWS Application\n<size:10>[Container: Spring Boot]</size>" <<FreelancerWebServices.FWSApplication>> {
+  rectangle "==Freelancer Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their work" <<FreelancerWebServices.FWSApplication.FreelancerService>> as FreelancerWebServices.FWSApplication.FreelancerService
+  rectangle "==Project Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their projects" <<FreelancerWebServices.FWSApplication.ProjectService>> as FreelancerWebServices.FWSApplication.ProjectService
+  rectangle "==Customer Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their customers" <<FreelancerWebServices.FWSApplication.CustomerService>> as FreelancerWebServices.FWSApplication.CustomerService
+  rectangle "==Billing Service\n<size:10>[Component: Java Package]</size>\n\nAllows freelancers to manage their billing" <<FreelancerWebServices.FWSApplication.BillingService>> as FreelancerWebServices.FWSApplication.BillingService
+}
+
+rectangle "Database\n<size:10>[Container: H2 Database]</size>" <<FreelancerWebServices.Database>> {
+  rectangle "==Projects\n<size:10>[Component: DB Schema]</size>\n\nStores projects data" <<FreelancerWebServices.Database.Projects>> as FreelancerWebServices.Database.Projects
+  rectangle "==Customers\n<size:10>[Component: DB Schema]</size>\n\nStores customers data" <<FreelancerWebServices.Database.Customers>> as FreelancerWebServices.Database.Customers
+  rectangle "==Billing\n<size:10>[Component: DB Schema]</size>\n\nStores billing data" <<FreelancerWebServices.Database.Billing>> as FreelancerWebServices.Database.Billing
+  rectangle "==Freelancers\n<size:10>[Component: DB Schema]</size>\n\nStores freelancers data" <<FreelancerWebServices.Database.Freelancers>> as FreelancerWebServices.Database.Freelancers
+}
+
+Freelancer .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.FreelancerService : "<color:#707070>Manages work using\n<color:#707070><size:8>[JSON/HTTPS]</size>"
+Freelancer .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.ProjectService : "<color:#707070>Manages projects using\n<color:#707070><size:8>[JSON/HTTPS]</size>"
+Freelancer .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.CustomerService : "<color:#707070>Manages customers using\n<color:#707070><size:8>[JSON/HTTPS]</size>"
+Freelancer .[#707070,thickness=2].> FreelancerWebServices.FWSApplication.BillingService : "<color:#707070>Manages billing using\n<color:#707070><size:8>[JSON/HTTPS]</size>"
+FreelancerWebServices.FWSApplication.FreelancerService .[#707070,thickness=2].> FreelancerWebServices.Database.Freelancers : "<color:#707070>Reads from and writes to\n<color:#707070><size:8>[JDBC]</size>"
+FreelancerWebServices.FWSApplication.ProjectService .[#707070,thickness=2].> FreelancerWebServices.Database.Projects : "<color:#707070>Reads from and writes to\n<color:#707070><size:8>[JDBC]</size>"
+FreelancerWebServices.FWSApplication.CustomerService .[#707070,thickness=2].> FreelancerWebServices.Database.Customers : "<color:#707070>Reads from and writes to\n<color:#707070><size:8>[JDBC]</size>"
+FreelancerWebServices.FWSApplication.BillingService .[#707070,thickness=2].> FreelancerWebServices.Database.Billing : "<color:#707070>Reads from and writes to\n<color:#707070><size:8>[JDBC]</size>"
+@enduml

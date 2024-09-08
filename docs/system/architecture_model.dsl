@@ -76,25 +76,25 @@ workspace {
   }
 
   views {
-    systemContext fws "SystemContext" {
+    systemContext fws "system_context" {
       title "Freelancer Web Services - System Context"
       include *
     }
 
-    container fws "Containers" {
+    container fws "containers" {
       title "Freelancer Web Services - Containers"
       include *
     }
 
-    component fwsApplication "Components" {
+    component fwsApplication "components" {
       title "Freelancer Web Services - Components"
       include freelancer
       include element.type==component
       exclude relationship.tag==internal
     }
 
-    component fwsApplication "Services" {
-      title "FWS Application - Services"
+    component fwsApplication "modules" {
+      title "Freelancer Web Services - Modules"
       include *
       exclude freelancer
       exclude database
