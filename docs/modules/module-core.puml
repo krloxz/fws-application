@@ -1,6 +1,6 @@
 @startuml
 set separator none
-title Common
+title Core
 
 top to bottom direction
 
@@ -9,7 +9,7 @@ top to bottom direction
 !include <C4/C4_Component>
 
 Container_Boundary("FwsApplication.FwsApplication_boundary", "FwsApplication", $tags="") {
-  Component(FwsApplication.FwsApplication.Common, "Common", $techn="Module", $descr="", $tags="", $link="")
+  Component(FwsApplication.FwsApplication.Core, "Core", $techn="Module", $descr="", $tags="", $link="")
 }
 
 

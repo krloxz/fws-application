@@ -14,12 +14,12 @@ import com.atlassian.oai.validator.whitelist.ValidationErrorsWhitelist;
 import com.atlassian.oai.validator.whitelist.rule.WhitelistRules;
 
 /**
- * Configures beans required for the {@link TestFwsApplication}.
+ * Configures Spring beans required to execute test methods.
  *
  * @author Carlos Gomez
  */
 @TestConfiguration
-class TestFwsApplicationConfig {
+class FwsApplicationTestConfig {
 
   @Bean
   MockMvcBuilderCustomizer MockMvcBuilderCustomizer() {

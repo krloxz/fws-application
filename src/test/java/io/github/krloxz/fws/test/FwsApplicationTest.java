@@ -25,7 +25,7 @@ import io.github.krloxz.fws.test.gherkin.GherkinConfig;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(DatabaseCleaner.class)
-@Import({TestFwsApplicationConfig.class, GherkinConfig.class})
+@Import({FwsApplicationTestConfig.class, GherkinConfig.class})
 public @interface FwsApplicationTest {
 
 }

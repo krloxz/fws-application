@@ -5,6 +5,7 @@ import static io.github.krloxz.fws.freelancer.FreelancerActions.freelancers;
 import static io.github.krloxz.fws.freelancer.FreelancerMother.mobile;
 import static io.github.krloxz.fws.freelancer.FreelancerMother.steveRogers;
 import static io.github.krloxz.fws.freelancer.FreelancerMother.tonyStark;
+import static io.github.krloxz.fws.freelancer.FreelancerMother.unregistered;
 import static io.github.krloxz.fws.test.gherkin.TestScenario.given;
 import static io.github.krloxz.fws.test.gherkin.actions.Actions.response;
 import static io.github.krloxz.fws.test.gherkin.actions.Actions.systemReady;
@@ -217,10 +218,6 @@ class FreelancersApiTest {
         .then(response())
         .contains(status().isNotFound())
         .contains(jsonPath("type").value(endsWith("/probs/error.html")));
-  }
-
-  private static FreelancerDto unregistered() {
-    return new FreelancerDtoBuilder().id("UNREGISTERED").build();
   }
 
   private static FreelancerDto invalidFreelancer() {

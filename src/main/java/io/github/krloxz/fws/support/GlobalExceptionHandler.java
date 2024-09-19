@@ -1,4 +1,4 @@
-package io.github.krloxz.fws;
+package io.github.krloxz.fws.support;
 
 import java.net.URI;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import io.github.krloxz.fws.core.DomainException;
 
 /**
  * Global exception handler that takes advantage of {@link ResponseEntityExceptionHandler} to handle
@@ -34,8 +38,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   private static final Log LOGGER = LogFactory.getLog(GlobalExceptionHandler.class);
 
   /**
-   * Wraps unexpected exceptions into a {@link ServerErrorException} and delegates to
-   * {@link #handleErrorResponseException(ErrorResponseException, HttpHeaders, HttpStatusCode, WebRequest)}.
+   * Wraps unexpected exceptions into {@link ServerErrorException}s and delegates to
+   * {@link #handleException(ResponseStatusException, WebRequest)}.
    *
    * @throws Exception
    */
@@ -46,13 +50,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         new ServerErrorException("The server is not able to handle the request", exception), request);
   }
 
+  /**
+   * Wraps domain exceptions into {@link ResponseStatusException}s and delegates to
+   * {@link #handleException(ResponseStatusException, WebRequest)}.
+   *
+   * @throws Exception
+   */
+  @ExceptionHandler
+  public ResponseEntity<Object> handleDomainException(final DomainException exception, final WebRequest request)
+      throws Exception {
+    return handleException(
+        new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage()), request);
+  }
+
   @Override
   protected ResponseEntity<Object> handleErrorResponseException(
       final ErrorResponseException exception,
       final HttpHeaders headers,
       final HttpStatusCode status,
       final WebRequest request) {
-    LOGGER.error("The request %s produced a server error: ".formatted(format(request)), exception);
+    if (exception.getStatusCode().is5xxServerError()) {
+      LOGGER.error("The request %s produced a server error: ".formatted(format(request)), exception);
+    } else {
+      LOGGER.debug("The request %s produced an error response: ".formatted(format(request)), exception);
+    }
     return super.handleErrorResponseException(exception, headers, status, request);
   }
 

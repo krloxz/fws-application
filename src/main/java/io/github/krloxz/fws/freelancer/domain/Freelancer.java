@@ -11,6 +11,8 @@ import org.immutables.value.Value;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import io.github.krloxz.fws.core.PersonName;
+
 /**
  * Represents a freelancer.
  *

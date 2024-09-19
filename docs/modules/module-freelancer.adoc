@@ -16,5 +16,4 @@ _Repositories_
 |* `i.g.k.f.f.domain.Address`
 * `i.g.k.f.f.domain.Gender`
 * `i.g.k.f.f.domain.HourlyWage`
-* `i.g.k.f.f.domain.PersonName`
 |===

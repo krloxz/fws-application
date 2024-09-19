@@ -32,7 +32,7 @@ class ProjectActions {
     return restApi -> restApi.get("/projects/" + this.project.id().orElseThrow());
   }
 
-  RestApiAction registered() {
+  RestApiAction created() {
     return restApi -> restApi.post("/projects", this.project);
   }
 

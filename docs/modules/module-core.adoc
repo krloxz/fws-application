@@ -1,0 +1,8 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`io.github.krloxz.fws.core`
+|Value types
+|* `i.g.k.f.c.FreelancerId`
+* `i.g.k.f.c.PersonName`
+|===

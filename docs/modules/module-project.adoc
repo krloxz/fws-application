@@ -10,6 +10,12 @@
 _Repositories_
 
 * `i.g.k.f.p.domain.ProjectRepository` (via `i.g.k.f.p.infra.JooqProjectRepository`)
+
+_Others_
+
+* `i.g.k.f.p.domain.FreelancerService` (via `i.g.k.f.p.infra.BasicFreelancerService`)
+|Bean references
+|* `i.g.k.f.f.application.FreelancersApiController` (in Freelancer Service)
 |Aggregate roots
 |* `i.g.k.f.p.domain.Project`
 |Value types

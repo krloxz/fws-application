@@ -1,4 +1,4 @@
-package io.github.krloxz.fws.common;
+package io.github.krloxz.fws.support;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 

@@ -19,13 +19,13 @@ import io.github.krloxz.fws.freelancer.domain.Gender;
  * @author Carlos Gomez
  * @see https://martinfowler.com/bliki/ObjectMother.html
  */
-abstract class FreelancerMother {
+public abstract class FreelancerMother {
 
   private FreelancerMother() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
 
-  static FreelancerDto tonyStark() {
+  public static FreelancerDto tonyStark() {
     return new FreelancerDtoBuilder()
         .id("fa8508ed-8b7b-4be7-b372-ac1094c709b5")
         .firstName("Tony")
@@ -47,8 +47,9 @@ abstract class FreelancerMother {
         .build();
   }
 
-  static FreelancerDto steveRogers() {
+  public static FreelancerDto steveRogers() {
     return new FreelancerDtoBuilder()
+        .id("d8e102e7-3e34-4d42-88ad-285488c13866")
         .firstName("Steve")
         .lastName("Rogers")
         .gender(Gender.MALE)
@@ -68,7 +69,7 @@ abstract class FreelancerMother {
         .build();
   }
 
-  static FreelancerDto freelancer(final String firstName, final String lastName) {
+  public static FreelancerDto freelancer(final String firstName, final String lastName) {
     return new FreelancerDtoBuilder()
         .firstName(firstName)
         .lastName(lastName)
@@ -89,14 +90,20 @@ abstract class FreelancerMother {
         .build();
   }
 
-  static CommunicationChannelDto mobile(final String number) {
+  public static FreelancerDto unregistered() {
+    return new FreelancerDtoBuilder()
+        .id("d8e102e7-3e34-4d42-88ad-285488c13866")
+        .build();
+  }
+
+  public static CommunicationChannelDto mobile(final String number) {
     return new CommunicationChannelDtoBuilder()
         .value(number)
         .type(CommunicationChannel.Type.MOBILE)
         .build();
   }
 
-  private static CommunicationChannelDto email(final String email) {
+  public static CommunicationChannelDto email(final String email) {
     return new CommunicationChannelDtoBuilder()
         .id(UUID.randomUUID().toString())
         .value(email)

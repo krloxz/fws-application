@@ -1,9 +1,9 @@
 == FwsApplication
 image::components.png[]
 
-== Common
-image::module-common.png[]
-include::module-common.adoc[]
+== Core
+image::module-core.png[]
+include::module-core.adoc[]
 
 == Project Service
 image::module-project.png[]
@@ -12,5 +12,9 @@ include::module-project.adoc[]
 == Freelancer Service
 image::module-freelancer.png[]
 include::module-freelancer.adoc[]
+
+== Support
+image::module-support.png[]
+include::module-support.adoc[]
 
 

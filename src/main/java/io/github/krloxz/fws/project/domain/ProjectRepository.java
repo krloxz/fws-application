@@ -3,7 +3,7 @@ package io.github.krloxz.fws.project.domain;
 import java.util.List;
 import java.util.Optional;
 
-import io.github.krloxz.fws.common.PageSpec;
+import io.github.krloxz.fws.core.PageSpec;
 
 /**
  * Repository for projects.
@@ -43,5 +43,14 @@ public interface ProjectRepository {
    * @return the saved project
    */
   Project save(Project project);
+
+  /**
+   * Updates a project.
+   *
+   * @param project
+   *        the project to update
+   * @return the updated project
+   */
+  Project update(Project project);
 
 }

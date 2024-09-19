@@ -1,4 +1,4 @@
-package io.github.krloxz.fws.common;
+package io.github.krloxz.fws.core;
 
 /**
  * Specification for a page of items to be retrieved.

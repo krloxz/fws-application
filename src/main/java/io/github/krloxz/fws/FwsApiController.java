@@ -1,6 +1,6 @@
 package io.github.krloxz.fws;
 
-import static io.github.krloxz.fws.common.AffordanceLink.affordanceLinkTo;
+import static io.github.krloxz.fws.support.AffordanceLink.affordanceLinkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.springframework.hateoas.CollectionModel;

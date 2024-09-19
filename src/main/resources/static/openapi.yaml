@@ -379,6 +379,43 @@ paths:
                 $ref: "#/components/schemas/Project"
         default:
           $ref: "#/components/responses/Error"
+  /projects/{id}/join:
+    post:
+      tags:
+        - Projects
+      description: Allows a freelancer to join a project.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Identifier of an existing project.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                freelancerId:
+                  type: string
+                  format: uuid
+                  description: Identifier of the freelancer that will join the project
+                  example: "fa8508ed-8b7b-4be7-b372-ac1094c709b5"
+                committedHours:
+                  type: integer
+                  description: Number of hours per week that the freelancer will commit to the project
+                  example: 100
+      responses:
+        "200":
+          description: Success
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        default:
+          $ref: "#/components/responses/Error"
 
 components:
   schemas:
@@ -536,6 +573,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
           nullable: true
           description: Unique identifier for the project
           example: "fa8508ed-8b7b-4be7-b372-ac1094c709b5"
@@ -547,19 +585,74 @@ components:
           type: string
           description: Description of the project
           example: "Earth's mightiest heroes"
+        requiredHours:
+          type: integer
+          description: Required hours for the project
+          example: 1000
+        _embedded:
+          type: object
+          description: Embedded resources for the project
+          readOnly: true
+          properties:
+            freelancers:
+              type: array
+              description: List of freelancers assigned to the project
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique identifier for the freelancer
+                    example: "fa8508ed-8b7b-4be7-b372-ac1094c709b5"
+                  firstName:
+                    type: string
+                    description: First name of the freelancer
+                    example: "Tony"
+                  lastName:
+                    type: string
+                    description: Last name of the freelancer
+                    example: "Stark"
+                  allocatedHours:
+                    type: integer
+                    description: Allocated hours for the freelancer in the project
+                    example: 100
+                  _links:
+                    type: object
+                    description: Links for subresources and actions available for the freelancer
+                    readOnly: true
+                    properties:
+                      self:
+                        $ref: "#/components/schemas/Link"
+                    required:
+                      - self
+                required:
+                  - id
+                  - firstName
+                  - lastName
+                  - allocatedHours
+                  - _links
+          required:
+            - freelancers
         _links:
           type: object
           description: Links for subresources and actions available for the project
-          required:
-            - self
+          readOnly: true
           properties:
             collection:
               $ref: "#/components/schemas/Link"
             self:
               $ref: "#/components/schemas/Link"
+            join:
+              $ref: "#/components/schemas/Link"
+          required:
+            - collection
+            - self
       required:
         - name
         - description
+        - requiredHours
+        - _embedded
+        - _links
     Page:
       type: object
       properties:

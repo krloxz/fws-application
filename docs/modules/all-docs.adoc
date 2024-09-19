@@ -1,13 +1,17 @@
 == FwsApplication
 plantuml::components.puml[]
 
-== Common
-plantuml::module-common.puml[]
-include::module-common.adoc[]
+== Core
+plantuml::module-core.puml[]
+include::module-core.adoc[]
 
 == Project Service
 plantuml::module-project.puml[]
 include::module-project.adoc[]
+
+== Support
+plantuml::module-support.puml[]
+include::module-support.adoc[]
 
 == Freelancer Service
 plantuml::module-freelancer.puml[]

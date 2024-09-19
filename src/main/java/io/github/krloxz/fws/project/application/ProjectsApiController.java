@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.github.krloxz.fws.common.PageSpec;
+import io.github.krloxz.fws.core.FreelancerId;
+import io.github.krloxz.fws.core.PageSpec;
+import io.github.krloxz.fws.project.domain.Freelancer;
+import io.github.krloxz.fws.project.domain.FreelancerService;
 import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.domain.ProjectRepository;
 
@@ -38,14 +41,17 @@ public class ProjectsApiController {
   private final ProjectRepository repository;
   private final ProjectDtoMapper mapper;
   private final ProjectDtoAssembler assembler;
+  private final FreelancerService freelancerService;
 
   ProjectsApiController(
       final ProjectRepository repository,
       final ProjectDtoMapper mapper,
-      final ProjectDtoAssembler assembler) {
+      final ProjectDtoAssembler assembler,
+      final FreelancerService freelancerService) {
     this.repository = repository;
     this.mapper = mapper;
     this.assembler = assembler;
+    this.freelancerService = freelancerService;
   }
 
   /**
@@ -100,6 +106,28 @@ public class ProjectsApiController {
         .orElseThrow();
   }
 
+  /**
+   * Allows a freelancer to join a project.
+   *
+   * @param id
+   *        the project identifier
+   * @param request
+   *        the join request
+   * @return the updated project data
+   */
+  @PostMapping("/{id}/join")
+  public EntityModel<ProjectDto> join(
+      @PathVariable final String id,
+      @Validated @RequestBody final JoinRequest request) {
+    return projectId(id)
+        .flatMap(this.repository::findById)
+        .map(project -> project.assign(findFreelancer(request), request.committedHours()))
+        .map(this.repository::update)
+        .map(this.mapper::toDto)
+        .map(this.assembler::toModel)
+        .orElseThrow();
+  }
+
   private PageSpec toPageSpec(final Pageable pageable) {
     return new PageSpec(pageable.getPageNumber(), pageable.getPageSize());
   }
@@ -114,6 +142,10 @@ public class ProjectsApiController {
     } catch (final IllegalArgumentException e) {
       return Optional.empty();
     }
+  }
+
+  private Freelancer findFreelancer(final JoinRequest request) {
+    return this.freelancerService.findFreelancer(new FreelancerId(request.freelancerId()));
   }
 
 }
