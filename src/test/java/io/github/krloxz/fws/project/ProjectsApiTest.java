@@ -13,11 +13,19 @@ import static io.github.krloxz.fws.test.gherkin.actions.Actions.response;
 import static io.github.krloxz.fws.test.gherkin.actions.Actions.systemReady;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.modulith.test.ApplicationModuleTest;
+import org.springframework.web.server.ResponseStatusException;
 
+import io.github.krloxz.fws.freelancer.application.FreelancersApiController;
 import io.github.krloxz.fws.project.application.ProjectDto;
 import io.github.krloxz.fws.project.application.ProjectDtoBuilder;
 import io.github.krloxz.fws.test.FwsApplicationTest;
@@ -28,7 +36,21 @@ import io.github.krloxz.fws.test.FwsApplicationTest;
  * @author Carlos Gomez
  */
 @FwsApplicationTest
+@ApplicationModuleTest(verifyAutomatically = false, extraIncludes = "test")
 class ProjectsApiTest {
+
+  @MockBean
+  private FreelancersApiController freelancersApiController;
+
+  @BeforeEach
+  void setup() {
+    when(this.freelancersApiController.get(tonyStark().id().orElseThrow()))
+        .thenReturn(EntityModel.of(tonyStark()));
+    when(this.freelancersApiController.get(steveRogers().id().orElseThrow()))
+        .thenReturn(EntityModel.of(steveRogers()));
+    when(this.freelancersApiController.get(unregistered().id().orElseThrow()))
+        .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+  }
 
   @Test
   void createProjects() {

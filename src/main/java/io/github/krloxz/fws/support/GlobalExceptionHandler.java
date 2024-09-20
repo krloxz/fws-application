@@ -60,7 +60,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleDomainException(final DomainException exception, final WebRequest request)
       throws Exception {
     return handleException(
-        new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage()), request);
+        new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage(), exception), request);
   }
 
   @Override

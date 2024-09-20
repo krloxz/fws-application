@@ -92,7 +92,7 @@ public abstract class FreelancerMother {
 
   public static FreelancerDto unregistered() {
     return new FreelancerDtoBuilder()
-        .id("d8e102e7-3e34-4d42-88ad-285488c13866")
+        .id("4a6142db-d20d-4016-9742-77753c0d06c7")
         .build();
   }
 
