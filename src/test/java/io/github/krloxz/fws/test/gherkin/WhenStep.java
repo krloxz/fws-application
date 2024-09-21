@@ -54,7 +54,7 @@ public class WhenStep {
    * @return a {@link ThenStep} to validate the system state
    */
   public ThenStep then(final Action<?, ?> action) {
-    return new ThenStep(lastResult(action));
+    return new ThenStep(lastResult(action), this.context);
   }
 
   private ActionResult<?> lastResult(final Action<?, ?> action) {

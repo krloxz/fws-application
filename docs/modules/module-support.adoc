@@ -3,6 +3,7 @@
 |Base package
 |`io.github.krloxz.fws.support`
 |Spring components
-|* `i.g.k.f.s.GlobalExceptionHandler`
+|* `i.g.k.f.s.DomainEventPublisher`
+* `i.g.k.f.s.GlobalExceptionHandler`
 * `i.g.k.f.s.OptionalMapper`
 |===

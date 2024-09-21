@@ -33,6 +33,7 @@ abstract class ProjectDtoMapper {
 
   @Mapping(target = "id.value", source = "id")
   @Mapping(target = "freelancers", source = "freelancers")
+  @Mapping(target = "domainEvents", ignore = true)
   public abstract Project fromDto(ProjectDto dto);
 
   @Mapping(target = "id.value", source = "id")

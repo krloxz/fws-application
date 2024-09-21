@@ -55,6 +55,7 @@ abstract class ProjectsRecordMapper {
 
   @Mapping(target = "id.value", source = "projectsRecord.id")
   @Mapping(target = "freelancers", source = "freelancersRecords")
+  @Mapping(target = "domainEvents", ignore = true)
   abstract Project fromRecords(
       ProjectsRecord projectsRecord, List<FreelancersRecord> freelancersRecords);
 

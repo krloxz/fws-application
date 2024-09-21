@@ -6,6 +6,7 @@ import org.immutables.value.Value;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import io.github.krloxz.fws.core.DomainEventSupplier;
 import io.github.krloxz.fws.core.DomainException;
 
 /**
@@ -15,7 +16,7 @@ import io.github.krloxz.fws.core.DomainException;
  */
 @AggregateRoot
 @Value.Immutable
-public abstract class Project {
+public abstract class Project implements DomainEventSupplier {
 
   /**
    * @return this project's identifier
@@ -60,6 +61,7 @@ public abstract class Project {
     }
     return copy()
         .addFreelancer(freelancer.allocate(committedHours))
+        .addDomainEvent(new FreelancerAssigned(id(), freelancer.id(), committedHours))
         .build();
   }
 

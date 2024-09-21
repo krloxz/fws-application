@@ -27,6 +27,7 @@ import io.github.krloxz.fws.project.domain.Freelancer;
 import io.github.krloxz.fws.project.domain.FreelancerService;
 import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.domain.ProjectRepository;
+import io.github.krloxz.fws.support.DomainEventPublisher;
 
 /**
  * Restful controller that exposes the Projects API.
@@ -42,16 +43,19 @@ public class ProjectsApiController {
   private final ProjectDtoMapper mapper;
   private final ProjectDtoAssembler assembler;
   private final FreelancerService freelancerService;
+  private final DomainEventPublisher eventPublisher;
 
   ProjectsApiController(
       final ProjectRepository repository,
       final ProjectDtoMapper mapper,
       final ProjectDtoAssembler assembler,
-      final FreelancerService freelancerService) {
+      final FreelancerService freelancerService,
+      final DomainEventPublisher eventPublisher) {
     this.repository = repository;
     this.mapper = mapper;
     this.assembler = assembler;
     this.freelancerService = freelancerService;
+    this.eventPublisher = eventPublisher;
   }
 
   /**
@@ -123,6 +127,7 @@ public class ProjectsApiController {
         .flatMap(this.repository::findById)
         .map(project -> project.assign(findFreelancer(request), request.committedHours()))
         .map(this.repository::update)
+        .map(this.eventPublisher::publish)
         .map(this.mapper::toDto)
         .map(this.assembler::toModel)
         .orElseThrow();

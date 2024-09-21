@@ -6,6 +6,7 @@ import static io.github.krloxz.fws.freelancer.FreelancerMother.unregistered;
 import static io.github.krloxz.fws.project.FreelancerProjectActions.freelancer;
 import static io.github.krloxz.fws.project.ProjectActions.project;
 import static io.github.krloxz.fws.project.ProjectActions.projects;
+import static io.github.krloxz.fws.test.PublishedEventsActionExtension.publishedEvents;
 import static io.github.krloxz.fws.test.assertions.Assertions.embedded;
 import static io.github.krloxz.fws.test.assertions.Assertions.link;
 import static io.github.krloxz.fws.test.gherkin.TestScenario.given;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import io.github.krloxz.fws.freelancer.application.FreelancersApiController;
 import io.github.krloxz.fws.project.application.ProjectDto;
 import io.github.krloxz.fws.project.application.ProjectDtoBuilder;
 import io.github.krloxz.fws.test.FwsApplicationTest;
+import io.github.krloxz.fws.test.PublishedEventsActionExtension;
 
 /**
  * Tests for the Projects API.
@@ -37,6 +40,7 @@ import io.github.krloxz.fws.test.FwsApplicationTest;
  */
 @FwsApplicationTest
 @ApplicationModuleTest(verifyAutomatically = false, extraIncludes = "test")
+@ExtendWith(PublishedEventsActionExtension.class)
 class ProjectsApiTest {
 
   @MockBean
@@ -166,6 +170,17 @@ class ProjectsApiTest {
         .then(response())
         .contains(status().isOk())
         .contains(jsonPath("_links.join").doesNotExist());
+  }
+
+  @Test
+  void publishFreelancerAssignation() {
+    given(project(avengers()).created())
+        .and(freelancer(tonyStark()).registered())
+        .when(freelancer(tonyStark()).joins(avengers()).withAllocation(40))
+        .then(publishedEvents())
+        .contains(jsonPath("$.[0].freelancerId.value").value(tonyStark().id().orElseThrow()))
+        .contains(jsonPath("$.[0].projectId.value").value(avengers().id().orElseThrow()))
+        .contains(jsonPath("$.[0].allocatedHours").value(40));
   }
 
   ProjectDto avengers() {
