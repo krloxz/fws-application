@@ -1,11 +1,17 @@
 package io.github.krloxz.fws.freelancer;
 
 import java.util.Optional;
+import java.util.UUID;
 
+import io.github.krloxz.fws.core.FreelancerId;
+import io.github.krloxz.fws.core.FreelancerJoinedProject;
+import io.github.krloxz.fws.core.ProjectId;
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
+import io.github.krloxz.fws.project.application.ProjectDto;
+import io.github.krloxz.fws.test.DomainEventAction;
 import io.github.krloxz.fws.test.gherkin.restapi.RestApiAction;
 
 /**
@@ -71,6 +77,13 @@ final class FreelancerActions {
 
   RestApiAction removesCommunicationChannel(final String id) {
     return restApi -> restApi.delete("/freelancers/" + freelancerId() + "/communication-channels/" + id);
+  }
+
+  DomainEventAction joins(final ProjectDto project, final int committedHours) {
+    return () -> new FreelancerJoinedProject(
+        new ProjectId(UUID.fromString(project.id().orElseThrow())),
+        new FreelancerId(freelancerId()),
+        committedHours);
   }
 
   private FreelancerDto freelancer() {

@@ -2,6 +2,7 @@ package io.github.krloxz.fws.support;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.github.krloxz.fws.core.DomainEventSupplier;
 
@@ -11,6 +12,7 @@ import io.github.krloxz.fws.core.DomainEventSupplier;
  * @author Carlos Gomez
  */
 @Component
+@Transactional
 public class DomainEventPublisher {
 
   private final ApplicationEventPublisher delegate;

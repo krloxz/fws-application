@@ -57,6 +57,11 @@ public abstract class Freelancer {
   public abstract HourlyWage wage();
 
   /**
+   * @return the number of hours per week that this freelancer is available
+   */
+  public abstract int weeklyAvailability();
+
+  /**
    * @return the nicknames of this freelancer
    */
   public abstract Set<String> nicknames();
@@ -151,6 +156,20 @@ public abstract class Freelancer {
             .from(this)
             .communicationChannels(newChannels)
             .build());
+  }
+
+  /**
+   * Reduces the weekly availability of this freelancer.
+   *
+   * @param hours
+   *        the hours to reduce
+   * @return a copy of this freelancer with the weekly availability reduced
+   */
+  public Freelancer reduceWeeklyAvailability(final int hours) {
+    return Freelancer.builder()
+        .from(this)
+        .weeklyAvailability(weeklyAvailability() - hours)
+        .build();
   }
 
 }

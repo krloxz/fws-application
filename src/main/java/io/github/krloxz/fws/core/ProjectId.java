@@ -1,4 +1,4 @@
-package io.github.krloxz.fws.project.domain;
+package io.github.krloxz.fws.core;
 
 import java.util.UUID;
 

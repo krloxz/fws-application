@@ -19,10 +19,4 @@ _Others_
 * `i.g.k.f.f.application.FreelancersApiController` (in Freelancer Service)
 |Aggregate roots
 |* `i.g.k.f.p.domain.Project`
-|Value types
-|* `i.g.k.f.p.domain.ProjectId`
-|Published events
-|* `i.g.k.f.p.domain.FreelancerAssigned` created by:
-** `i.g.k.f.p.domain.Project.assign(…)`
-
 |===

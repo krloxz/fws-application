@@ -42,6 +42,7 @@ public abstract class FreelancerMother {
                 .country("USA")
                 .build())
         .wage(new HourlyWageDto(new BigDecimal("5000000"), "USD"))
+        .weeklyAvailability(40)
         .addNickname("Iron Man")
         .addCommunicationChannels(email("tony@avengers.org"), email("ironman@avengers.org"))
         .build();
@@ -64,6 +65,7 @@ public abstract class FreelancerMother {
                 .country("USA")
                 .build())
         .wage(new HourlyWageDto(new BigDecimal("500"), "USD"))
+        .weeklyAvailability(40)
         .addNickname("Captain America")
         .addCommunicationChannel(email("cap@avengers.org"))
         .build();
@@ -85,6 +87,7 @@ public abstract class FreelancerMother {
                 .country("USA")
                 .build())
         .wage(new HourlyWageDto(new BigDecimal("30"), "USD"))
+        .weeklyAvailability(40)
         .addNickname(firstName + " Nickname")
         .addCommunicationChannel(email(firstName + "@email.com"))
         .build();

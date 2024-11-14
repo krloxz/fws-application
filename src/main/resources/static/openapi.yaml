@@ -454,6 +454,10 @@ components:
           $ref: "#/components/schemas/Address"
         wage:
           $ref: "#/components/schemas/Wage"
+        weeklyAvailability:
+          type: integer
+          description: Number of hours per week that the freelancer is available
+          example: 40
         nicknames:
           type: array
           description: List of nicknames for the freelancer
@@ -496,6 +500,7 @@ components:
         - birthDate
         - address
         - wage
+        - weeklyAvailability
         - nicknames
         - communicationChannels
     Address:

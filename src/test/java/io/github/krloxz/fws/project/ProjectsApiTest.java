@@ -20,18 +20,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.modulith.test.ApplicationModuleTest;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.github.krloxz.fws.freelancer.application.FreelancersApiController;
 import io.github.krloxz.fws.project.application.ProjectDto;
 import io.github.krloxz.fws.project.application.ProjectDtoBuilder;
 import io.github.krloxz.fws.test.FwsApplicationTest;
-import io.github.krloxz.fws.test.PublishedEventsActionExtension;
 
 /**
  * Tests for the Projects API.
@@ -39,8 +36,6 @@ import io.github.krloxz.fws.test.PublishedEventsActionExtension;
  * @author Carlos Gomez
  */
 @FwsApplicationTest
-@ApplicationModuleTest(verifyAutomatically = false, extraIncludes = "test")
-@ExtendWith(PublishedEventsActionExtension.class)
 class ProjectsApiTest {
 
   @MockBean

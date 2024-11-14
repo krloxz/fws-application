@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.modulith.Modulithic;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Main class that bootstraps the Freelancer Web Services application.
@@ -14,6 +15,7 @@ import org.springframework.modulith.Modulithic;
 @SpringBootApplication
 @EnableHypermediaSupport(type = {HypermediaType.HAL})
 @Modulithic(sharedModules = {"core", "support"})
+@EnableAsync
 public class FwsApplication {
 
   public static void main(final String[] args) {

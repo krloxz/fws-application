@@ -9,6 +9,7 @@ import org.jmolecules.event.types.DomainEvent;
  *
  * @author Carlos Gomez
  */
+@FunctionalInterface
 public interface DomainEventSupplier {
 
   /**

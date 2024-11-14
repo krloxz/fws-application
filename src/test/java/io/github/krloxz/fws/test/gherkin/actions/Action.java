@@ -95,9 +95,13 @@ public interface Action<T, R> {
     // No-op by default; override to provide validation logic
   }
 
+  @SuppressWarnings("unchecked")
   private T inputValue(final ApplicationContext context) {
     if (Void.class.equals(inputType())) {
       return null;
+    }
+    if (ApplicationContext.class.equals(inputType())) {
+      return (T) context;
     }
     return context.getBean(inputType());
   }

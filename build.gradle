@@ -39,6 +39,7 @@ dependencies {
 
   // Spring Modulith
   implementation 'org.springframework.modulith:spring-modulith-starter-core'
+  implementation 'org.springframework.modulith:spring-modulith-starter-jdbc'
   implementation 'org.jmolecules.integrations:jmolecules-starter-ddd'
   implementation 'org.jmolecules:jmolecules-onion-architecture'
 

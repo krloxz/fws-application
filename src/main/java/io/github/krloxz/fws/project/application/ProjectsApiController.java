@@ -23,9 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.github.krloxz.fws.core.FreelancerId;
 import io.github.krloxz.fws.core.PageSpec;
+import io.github.krloxz.fws.core.ProjectId;
 import io.github.krloxz.fws.project.domain.Freelancer;
 import io.github.krloxz.fws.project.domain.FreelancerService;
-import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.domain.ProjectRepository;
 import io.github.krloxz.fws.support.DomainEventPublisher;
 

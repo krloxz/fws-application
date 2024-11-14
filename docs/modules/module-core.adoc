@@ -5,4 +5,9 @@
 |Value types
 |* `i.g.k.f.c.FreelancerId`
 * `i.g.k.f.c.PersonName`
+* `i.g.k.f.c.ProjectId`
+|Published events
+|* `i.g.k.f.c.FreelancerJoinedProject` created by:
+** `io.github.krloxz.fws.project.domain.Project.assign(…)`
+
 |===

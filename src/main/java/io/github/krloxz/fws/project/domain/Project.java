@@ -8,6 +8,8 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import io.github.krloxz.fws.core.DomainEventSupplier;
 import io.github.krloxz.fws.core.DomainException;
+import io.github.krloxz.fws.core.FreelancerJoinedProject;
+import io.github.krloxz.fws.core.ProjectId;
 
 /**
  * Represents a project.
@@ -61,7 +63,7 @@ public abstract class Project implements DomainEventSupplier {
     }
     return copy()
         .addFreelancer(freelancer.allocate(committedHours))
-        .addDomainEvent(new FreelancerAssigned(id(), freelancer.id(), committedHours))
+        .addDomainEvent(new FreelancerJoinedProject(id(), freelancer.id(), committedHours))
         .build();
   }
 
