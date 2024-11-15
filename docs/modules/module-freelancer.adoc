@@ -14,6 +14,8 @@ _Repositories_
 _Event listeners_
 
 * `i.g.k.f.f.application.FreelancerEventListener` listening to `i.g.k.f.c.FreelancerJoinedProject`
+|Bean references
+|* `i.g.k.f.s.DomainEventPublisher` (in Support)
 |Aggregate roots
 |* `i.g.k.f.f.domain.Freelancer`
 |Value types

@@ -3,6 +3,7 @@ package io.github.krloxz.fws.freelancer;
 import static io.github.krloxz.fws.freelancer.FreelancerActions.freelancer;
 import static io.github.krloxz.fws.freelancer.FreelancerActions.freelancers;
 import static io.github.krloxz.fws.freelancer.FreelancerMother.tonyStark;
+import static io.github.krloxz.fws.test.PublishedEventsActionExtension.publishedEvents;
 import static io.github.krloxz.fws.test.gherkin.TestScenario.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -27,6 +28,26 @@ class FreelancerEventsTest {
         .then(freelancers().collection())
         .contains(
             jsonPath("_embedded.freelancers[0].weeklyAvailability").value(tonyStark().weeklyAvailability() - 30));
+  }
+
+  @Test
+  void publishEventWhenFreelancerFailsToCommitMoreHoursThanAvailable() {
+    given(freelancer(tonyStark()).registered())
+        .when(freelancer(tonyStark()).joins(avengers(), tonyStark().weeklyAvailability() + 10))
+        .then(publishedEvents())
+        .contains(jsonPath("$.[1].freelancerId.value").value(tonyStark().id().orElseThrow()))
+        .contains(jsonPath("$.[1].projectId.value").value(avengers().id().orElseThrow()))
+        .contains(jsonPath("$.[1].committedHours").value(tonyStark().weeklyAvailability() + 10))
+        .contains(jsonPath("$.[1].availableHours").value(tonyStark().weeklyAvailability()));
+  }
+
+  @Test
+  void availabilityDoesNotChangeWhenFreelancerFailsToCommitMoreHoursThanAvailable() {
+    given(freelancer(tonyStark()).registered())
+        .when(freelancer(tonyStark()).joins(avengers(), tonyStark().weeklyAvailability() + 10))
+        .then(freelancers().collection())
+        .contains(
+            jsonPath("_embedded.freelancers[0].weeklyAvailability").value(tonyStark().weeklyAvailability()));
   }
 
   ProjectDto avengers() {

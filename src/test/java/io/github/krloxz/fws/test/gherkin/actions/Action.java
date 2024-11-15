@@ -54,6 +54,20 @@ public interface Action<T, R> {
   }
 
   /**
+   * Chains this action with another action, creating a new action that performs both actions
+   * sequentially.
+   *
+   * @param <V>
+   *        the result type of the next action
+   * @param next
+   *        the action to be executed after this action
+   * @return a new action that executes this action followed by the provided action
+   */
+  default <V> Action<ApplicationContext, V> andThen(final Action<?, V> next) {
+    return new ChainedAction<>(this, next);
+  }
+
+  /**
    * Performs the core logic of this action using the provided input bean.
    * <p>
    * This method should be overridden by the final implementations of this interface to define the
@@ -104,6 +118,42 @@ public interface Action<T, R> {
       return (T) context;
     }
     return context.getBean(inputType());
+  }
+
+  /**
+   * Represents an action that chains two actions together, executing the first action followed by the
+   * second action.
+   *
+   * @author Carlos Gomez
+   * @param <V>
+   *        the result type of the second action
+   */
+  static class ChainedAction<V> implements Action<ApplicationContext, V> {
+
+    private final Action<?, ?> first;
+    private final Action<?, V> second;
+
+    private ChainedAction(final Action<?, ?> first, final Action<?, V> second) {
+      this.first = first;
+      this.second = second;
+    }
+
+    @Override
+    public V perform(final ApplicationContext context) {
+      this.first.execute(context);
+      return this.second.execute(context).getValue();
+    }
+
+    @Override
+    public Class<ApplicationContext> inputType() {
+      return ApplicationContext.class;
+    }
+
+    @Override
+    public void validateResult(final V result) {
+      this.second.validateResult(result);
+    }
+
   }
 
 }

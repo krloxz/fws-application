@@ -1,5 +1,6 @@
 package io.github.krloxz.fws.project.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.immutables.value.Value;
@@ -8,6 +9,7 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import io.github.krloxz.fws.core.DomainEventSupplier;
 import io.github.krloxz.fws.core.DomainException;
+import io.github.krloxz.fws.core.FreelancerId;
 import io.github.krloxz.fws.core.FreelancerJoinedProject;
 import io.github.krloxz.fws.core.ProjectId;
 
@@ -64,6 +66,21 @@ public abstract class Project implements DomainEventSupplier {
     return copy()
         .addFreelancer(freelancer.allocate(committedHours))
         .addDomainEvent(new FreelancerJoinedProject(id(), freelancer.id(), committedHours))
+        .build();
+  }
+
+  /**
+   * Removes a freelancer from this project.
+   *
+   * @param freelancerId
+   *        the identifier of the freelancer to remove
+   * @return a new instance of this project without the freelancer
+   */
+  public Project remove(final FreelancerId freelancerId) {
+    final var newFreelancers = new ArrayList<>(freelancers());
+    newFreelancers.removeIf(freelancer -> freelancer.id().equals(freelancerId));
+    return copy()
+        .freelancers(newFreelancers)
         .build();
   }
 

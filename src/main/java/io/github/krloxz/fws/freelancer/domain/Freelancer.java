@@ -11,7 +11,11 @@ import org.immutables.value.Value;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import io.github.krloxz.fws.core.DomainEventSupplier;
+import io.github.krloxz.fws.core.FreelancerId;
+import io.github.krloxz.fws.core.FreelancerProjectCommitmentFailed;
 import io.github.krloxz.fws.core.PersonName;
+import io.github.krloxz.fws.core.ProjectId;
 
 /**
  * Represents a freelancer.
@@ -21,7 +25,7 @@ import io.github.krloxz.fws.core.PersonName;
 @AggregateRoot
 @Value.Immutable
 @Value.Style(depluralize = true)
-public abstract class Freelancer {
+public abstract class Freelancer implements DomainEventSupplier {
 
   /**
    * @return the unique identifier of this freelancer
@@ -163,9 +167,18 @@ public abstract class Freelancer {
    *
    * @param hours
    *        the hours to reduce
+   * @param projectId
+   *        identifier of the project triggering the availability reduction
    * @return a copy of this freelancer with the weekly availability reduced
    */
-  public Freelancer reduceWeeklyAvailability(final int hours) {
+  public Freelancer reduceWeeklyAvailability(final int hours, final ProjectId projectId) {
+    if (weeklyAvailability() < hours) {
+      return Freelancer.builder()
+          .from(this)
+          .addDomainEvent(
+              new FreelancerProjectCommitmentFailed(new FreelancerId(id()), projectId, hours, weeklyAvailability()))
+          .build();
+    }
     return Freelancer.builder()
         .from(this)
         .weeklyAvailability(weeklyAvailability() - hours)

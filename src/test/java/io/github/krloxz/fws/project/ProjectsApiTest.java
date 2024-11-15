@@ -178,6 +178,15 @@ class ProjectsApiTest {
         .contains(jsonPath("$.[0].allocatedHours").value(40));
   }
 
+  @Test
+  void projectRevertedWhenFreelancerNotAvailable() {
+    given(project(avengers()).created())
+        .when(freelancer(tonyStark()).joins(avengers()).overCommitingAvailableTime())
+        .then(projects().listed())
+        .contains(embedded("projects[0].name").withValue(avengers().name()))
+        .contains(embedded("projects[0]._embedded.freelancers").withLength(0));
+  }
+
   ProjectDto avengers() {
     return new ProjectDtoBuilder()
         .id("eda7cd79-1976-46fc-81ef-fe5f6dba7aa5")
