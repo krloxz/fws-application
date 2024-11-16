@@ -1,5 +1,6 @@
 package io.github.krloxz.fws.project.application;
 
+import static io.github.krloxz.fws.support.AffordanceLink.affordanceLink;
 import static io.github.krloxz.fws.support.AffordanceLink.affordanceLinkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -15,7 +16,6 @@ import org.springframework.hateoas.mediatype.hal.HalModelBuilder;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
-import io.github.krloxz.fws.freelancer.application.FreelancersApiController;
 import io.github.krloxz.fws.support.AffordanceLink;
 
 /**
@@ -68,7 +68,7 @@ class ProjectDtoAssembler implements RepresentationModelAssembler<ProjectDto, En
 
   private EntityModel<FreelancerDto> toModel(final FreelancerDto dto) {
     return EntityModel.of(dto)
-        .add(affordanceLinkTo(methodOn(FreelancersApiController.class).get(dto.id().toString())).withSelfRel());
+        .add(affordanceLink("/freelancers/" + dto.id()).withSelfRel());
   }
 
   private boolean isProjectFullyAllocated(final ProjectDto dto) {

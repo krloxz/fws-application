@@ -14,15 +14,14 @@ _Repositories_
 _Event listeners_
 
 * `i.g.k.f.p.application.ProjectEventListener` listening to `i.g.k.f.c.FreelancerProjectCommitmentFailed`
-
-_Others_
-
-* `i.g.k.f.p.domain.FreelancerService` (via `i.g.k.f.p.infra.BasicFreelancerService`)
 |Bean references
 |* `i.g.k.f.s.DomainEventPublisher` (in Support)
-* `i.g.k.f.f.application.FreelancersApiController` (in Freelancer Service)
 |Aggregate roots
 |* `i.g.k.f.p.domain.Project`
+|Published events
+|* `i.g.k.f.p.domain.FreelancerJoinedProject` created by:
+** `i.g.k.f.p.domain.Project.assign(…)`
+
 |Events listened to
 |* `i.g.k.f.c.FreelancerProjectCommitmentFailed`
 |===

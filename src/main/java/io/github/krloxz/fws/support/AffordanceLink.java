@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * A {@link Link} that renders as an affordance.
@@ -77,6 +78,17 @@ public class AffordanceLink extends Link {
         .map(HttpMethod::name)
         .orElse("GET");
     return new AffordanceLink(link.getHref(), relation, method);
+  }
+
+  /**
+   * Creates an affordance link for the given path and the GET method.
+   *
+   * @param path
+   *        the path to create the affordance link for
+   * @return an affordance link for the given path
+   */
+  public static AffordanceLink affordanceLink(final String path) {
+    return toAffordanceLink(Link.of(ServletUriComponentsBuilder.fromCurrentContextPath().toUriString() + path));
   }
 
   /**

@@ -1,4 +1,4 @@
-package io.github.krloxz.fws.project.infra;
+package io.github.krloxz.fws.freelancer.infra;
 
 import java.util.Optional;
 import java.util.UUID;

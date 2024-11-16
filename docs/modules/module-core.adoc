@@ -7,9 +7,7 @@
 * `i.g.k.f.c.PersonName`
 * `i.g.k.f.c.ProjectId`
 |Published events
-|* `i.g.k.f.c.FreelancerJoinedProject` created by:
-** `io.github.krloxz.fws.project.domain.Project.assign(…)`
-* `i.g.k.f.c.FreelancerProjectCommitmentFailed` created by:
+|* `i.g.k.f.c.FreelancerProjectCommitmentFailed` created by:
 ** `io.github.krloxz.fws.freelancer.domain.Freelancer.reduceWeeklyAvailability(…)`
 
 |===

@@ -3,8 +3,8 @@ package io.github.krloxz.fws.freelancer.application;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
-import io.github.krloxz.fws.core.FreelancerJoinedProject;
 import io.github.krloxz.fws.freelancer.domain.FreelancerRepository;
+import io.github.krloxz.fws.project.domain.FreelancerJoinedProject;
 import io.github.krloxz.fws.support.DomainEventPublisher;
 
 /**

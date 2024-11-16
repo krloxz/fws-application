@@ -21,13 +21,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
-import io.github.krloxz.fws.freelancer.application.FreelancersApiController;
+import io.github.krloxz.fws.core.DomainException;
+import io.github.krloxz.fws.core.FreelancerId;
+import io.github.krloxz.fws.core.PersonName;
+import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.project.application.ProjectDto;
 import io.github.krloxz.fws.project.application.ProjectDtoBuilder;
+import io.github.krloxz.fws.project.domain.Freelancer;
+import io.github.krloxz.fws.project.domain.FreelancerService;
 import io.github.krloxz.fws.test.FwsApplicationTest;
 
 /**
@@ -39,16 +41,16 @@ import io.github.krloxz.fws.test.FwsApplicationTest;
 class ProjectsApiTest {
 
   @MockBean
-  private FreelancersApiController freelancersApiController;
+  private FreelancerService freelancerService;
 
   @BeforeEach
   void setup() {
-    when(this.freelancersApiController.get(tonyStark().id().orElseThrow()))
-        .thenReturn(EntityModel.of(tonyStark()));
-    when(this.freelancersApiController.get(steveRogers().id().orElseThrow()))
-        .thenReturn(EntityModel.of(steveRogers()));
-    when(this.freelancersApiController.get(unregistered().id().orElseThrow()))
-        .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+    when(this.freelancerService.findFreelancer(new FreelancerId(tonyStark().id().orElseThrow())))
+        .thenReturn(toProjectFreelancer(tonyStark()));
+    when(this.freelancerService.findFreelancer(new FreelancerId(steveRogers().id().orElseThrow())))
+        .thenReturn(toProjectFreelancer(steveRogers()));
+    when(this.freelancerService.findFreelancer(new FreelancerId(unregistered().id().orElseThrow())))
+        .thenThrow(new DomainException("Freelancer is not allowed to join this project"));
   }
 
   @Test
@@ -187,13 +189,20 @@ class ProjectsApiTest {
         .contains(embedded("projects[0]._embedded.freelancers").withLength(0));
   }
 
-  ProjectDto avengers() {
+  private ProjectDto avengers() {
     return new ProjectDtoBuilder()
         .id("eda7cd79-1976-46fc-81ef-fe5f6dba7aa5")
         .name("Avengers")
         .description("Earth's mightiest heroes")
         .requiredHours(200)
         .build();
+  }
+
+  private Freelancer toProjectFreelancer(final FreelancerDto dto) {
+    return new Freelancer(
+        new FreelancerId(dto.id().orElseThrow()),
+        PersonName.builder().first(dto.firstName()).last(dto.lastName()).build(),
+        dto.weeklyAvailability());
   }
 
 }

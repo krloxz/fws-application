@@ -13,7 +13,12 @@ _Repositories_
 
 _Event listeners_
 
-* `i.g.k.f.f.application.FreelancerEventListener` listening to `i.g.k.f.c.FreelancerJoinedProject`
+* `i.g.k.f.f.application.FreelancerEventListener` listening to `i.g.k.f.p.domain.FreelancerJoinedProject`
+
+_Others_
+
+* `i.g.k.f.f.application.FreelancerProcessor`
+* `i.g.k.f.f.infra.BasicFreelancerService`
 |Bean references
 |* `i.g.k.f.s.DomainEventPublisher` (in Support)
 |Aggregate roots
@@ -23,5 +28,5 @@ _Event listeners_
 * `i.g.k.f.f.domain.Gender`
 * `i.g.k.f.f.domain.HourlyWage`
 |Events listened to
-|* `i.g.k.f.c.FreelancerJoinedProject`
+|* `i.g.k.f.p.domain.FreelancerJoinedProject`
 |===
