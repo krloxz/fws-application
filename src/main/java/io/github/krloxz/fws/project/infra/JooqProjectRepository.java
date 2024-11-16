@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.github.krloxz.fws.core.PageSpec;
-import io.github.krloxz.fws.core.ProjectId;
 import io.github.krloxz.fws.project.domain.Project;
+import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.domain.ProjectRepository;
 
 /**

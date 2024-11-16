@@ -12,10 +12,10 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import io.github.krloxz.fws.core.DomainEventSupplier;
-import io.github.krloxz.fws.core.FreelancerId;
-import io.github.krloxz.fws.core.FreelancerProjectCommitmentFailed;
 import io.github.krloxz.fws.core.PersonName;
-import io.github.krloxz.fws.core.ProjectId;
+import io.github.krloxz.fws.project.domain.FreelancerId;
+import io.github.krloxz.fws.project.domain.FreelancerProjectCommitmentFailed;
+import io.github.krloxz.fws.project.domain.ProjectId;
 
 /**
  * Represents a freelancer.

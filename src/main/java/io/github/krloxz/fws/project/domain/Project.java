@@ -9,8 +9,6 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import io.github.krloxz.fws.core.DomainEventSupplier;
 import io.github.krloxz.fws.core.DomainException;
-import io.github.krloxz.fws.core.FreelancerId;
-import io.github.krloxz.fws.core.ProjectId;
 
 /**
  * Represents a project.

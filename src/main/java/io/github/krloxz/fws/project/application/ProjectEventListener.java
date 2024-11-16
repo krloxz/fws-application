@@ -3,7 +3,7 @@ package io.github.krloxz.fws.project.application;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
-import io.github.krloxz.fws.core.FreelancerProjectCommitmentFailed;
+import io.github.krloxz.fws.project.domain.FreelancerProjectCommitmentFailed;
 import io.github.krloxz.fws.project.domain.ProjectRepository;
 
 /**

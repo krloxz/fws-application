@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import io.github.krloxz.fws.core.PageSpec;
-import io.github.krloxz.fws.core.ProjectId;
 
 /**
  * Repository for projects.

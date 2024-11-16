@@ -7,7 +7,6 @@ import java.util.Set;
 import org.hibernate.validator.constraints.UUID;
 import org.immutables.builder.Builder;
 import org.springframework.hateoas.server.core.Relation;
-import org.springframework.modulith.NamedInterface;
 
 import io.github.krloxz.fws.freelancer.domain.Freelancer;
 import io.github.krloxz.fws.freelancer.domain.Gender;
@@ -23,7 +22,6 @@ import jakarta.validation.constraints.Positive;
  * @author Carlos Gomez
  */
 @Relation(collectionRelation = "freelancers")
-@NamedInterface("application")
 public record FreelancerDto(
     Optional<@UUID String> id,
     @NotBlank String firstName,

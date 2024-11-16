@@ -3,11 +3,5 @@
 |Base package
 |`io.github.krloxz.fws.core`
 |Value types
-|* `i.g.k.f.c.FreelancerId`
-* `i.g.k.f.c.PersonName`
-* `i.g.k.f.c.ProjectId`
-|Published events
-|* `i.g.k.f.c.FreelancerProjectCommitmentFailed` created by:
-** `io.github.krloxz.fws.freelancer.domain.Freelancer.reduceWeeklyAvailability(…)`
-
+|* `i.g.k.f.c.PersonName`
 |===

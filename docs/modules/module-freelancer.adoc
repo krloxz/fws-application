@@ -17,7 +17,6 @@ _Event listeners_
 
 _Others_
 
-* `i.g.k.f.f.application.FreelancerProcessor`
 * `i.g.k.f.f.infra.BasicFreelancerService`
 |Bean references
 |* `i.g.k.f.s.DomainEventPublisher` (in Support)

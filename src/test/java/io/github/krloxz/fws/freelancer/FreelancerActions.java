@@ -3,14 +3,14 @@ package io.github.krloxz.fws.freelancer;
 import java.util.Optional;
 import java.util.UUID;
 
-import io.github.krloxz.fws.core.FreelancerId;
-import io.github.krloxz.fws.core.ProjectId;
 import io.github.krloxz.fws.freelancer.application.dtos.AddressDto;
 import io.github.krloxz.fws.freelancer.application.dtos.CommunicationChannelDto;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.freelancer.application.dtos.HourlyWageDto;
 import io.github.krloxz.fws.project.application.ProjectDto;
+import io.github.krloxz.fws.project.domain.FreelancerId;
 import io.github.krloxz.fws.project.domain.FreelancerJoinedProject;
+import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.test.DomainEventAction;
 import io.github.krloxz.fws.test.gherkin.restapi.RestApiAction;
 

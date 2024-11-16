@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import io.github.krloxz.fws.core.DomainException;
-import io.github.krloxz.fws.core.FreelancerId;
 import io.github.krloxz.fws.core.PersonName;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.project.application.ProjectDto;
 import io.github.krloxz.fws.project.application.ProjectDtoBuilder;
 import io.github.krloxz.fws.project.domain.Freelancer;
+import io.github.krloxz.fws.project.domain.FreelancerId;
 import io.github.krloxz.fws.project.domain.FreelancerService;
 import io.github.krloxz.fws.test.FwsApplicationTest;
 

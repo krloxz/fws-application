@@ -1,7 +1,6 @@
 package io.github.krloxz.fws.project.domain;
 
 import io.github.krloxz.fws.core.DomainException;
-import io.github.krloxz.fws.core.FreelancerId;
 
 /**
  * Service to manage freelancers.

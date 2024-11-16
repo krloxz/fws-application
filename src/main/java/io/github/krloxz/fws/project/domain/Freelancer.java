@@ -3,7 +3,6 @@ package io.github.krloxz.fws.project.domain;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 
-import io.github.krloxz.fws.core.FreelancerId;
 import io.github.krloxz.fws.core.PersonName;
 
 /**

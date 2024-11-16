@@ -10,9 +10,9 @@ import org.jooq.Record;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import io.github.krloxz.fws.core.ProjectId;
 import io.github.krloxz.fws.project.domain.Freelancer;
 import io.github.krloxz.fws.project.domain.Project;
+import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.project.infra.jooq.tables.records.FreelancersRecord;
 import io.github.krloxz.fws.project.infra.jooq.tables.records.ProjectsRecord;
 import io.github.krloxz.fws.support.OptionalMapper;

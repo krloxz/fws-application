@@ -5,12 +5,12 @@ import java.util.UUID;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.web.servlet.MvcResult;
 
-import io.github.krloxz.fws.core.FreelancerId;
-import io.github.krloxz.fws.core.FreelancerProjectCommitmentFailed;
-import io.github.krloxz.fws.core.ProjectId;
 import io.github.krloxz.fws.freelancer.application.dtos.FreelancerDto;
 import io.github.krloxz.fws.project.application.JoinRequest;
 import io.github.krloxz.fws.project.application.ProjectDto;
+import io.github.krloxz.fws.project.domain.FreelancerId;
+import io.github.krloxz.fws.project.domain.FreelancerProjectCommitmentFailed;
+import io.github.krloxz.fws.project.domain.ProjectId;
 import io.github.krloxz.fws.test.DomainEventAction;
 import io.github.krloxz.fws.test.gherkin.actions.Action;
 import io.github.krloxz.fws.test.gherkin.actions.VoidAction;

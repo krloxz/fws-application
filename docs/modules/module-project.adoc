@@ -13,15 +13,18 @@ _Repositories_
 
 _Event listeners_
 
-* `i.g.k.f.p.application.ProjectEventListener` listening to `i.g.k.f.c.FreelancerProjectCommitmentFailed`
+* `i.g.k.f.p.application.ProjectEventListener` listening to `i.g.k.f.p.domain.FreelancerProjectCommitmentFailed`
 |Bean references
 |* `i.g.k.f.s.DomainEventPublisher` (in Support)
 |Aggregate roots
 |* `i.g.k.f.p.domain.Project`
+|Value types
+|* `i.g.k.f.p.domain.FreelancerId`
+* `i.g.k.f.p.domain.ProjectId`
 |Published events
 |* `i.g.k.f.p.domain.FreelancerJoinedProject` created by:
 ** `i.g.k.f.p.domain.Project.assign(…)`
+* `i.g.k.f.p.domain.FreelancerProjectCommitmentFailed` created by:
+** `io.github.krloxz.fws.freelancer.domain.Freelancer.reduceWeeklyAvailability(…)`
 
-|Events listened to
-|* `i.g.k.f.c.FreelancerProjectCommitmentFailed`
 |===
