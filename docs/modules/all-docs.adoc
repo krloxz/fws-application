@@ -9,11 +9,11 @@ include::module-core.adoc[]
 plantuml::module-project.puml[]
 include::module-project.adoc[]
 
-== Support
-plantuml::module-support.puml[]
-include::module-support.adoc[]
-
 == Freelancer Service
 plantuml::module-freelancer.puml[]
 include::module-freelancer.adoc[]
+
+== Support
+plantuml::module-support.puml[]
+include::module-support.adoc[]
 

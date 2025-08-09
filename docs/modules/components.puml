@@ -11,16 +11,16 @@ top to bottom direction
 Container_Boundary("FwsApplication.FwsApplication_boundary", "FwsApplication", $tags="") {
   Component(FwsApplication.FwsApplication.Core, "Core", $techn="Module", $descr="", $tags="", $link="")
   Component(FwsApplication.FwsApplication.ProjectService, "Project Service", $techn="Module", $descr="", $tags="", $link="")
-  Component(FwsApplication.FwsApplication.Support, "Support", $techn="Module", $descr="", $tags="", $link="")
   Component(FwsApplication.FwsApplication.FreelancerService, "Freelancer Service", $techn="Module", $descr="", $tags="", $link="")
+  Component(FwsApplication.FwsApplication.Support, "Support", $techn="Module", $descr="", $tags="", $link="")
 }
 
+Rel(FwsApplication.FwsApplication.Support, FwsApplication.FwsApplication.Core, "depends on", $techn="", $tags="", $link="")
+Rel(FwsApplication.FwsApplication.FreelancerService, FwsApplication.FwsApplication.ProjectService, "listens to", $techn="", $tags="", $link="")
 Rel(FwsApplication.FwsApplication.FreelancerService, FwsApplication.FwsApplication.Core, "depends on", $techn="", $tags="", $link="")
 Rel(FwsApplication.FwsApplication.FreelancerService, FwsApplication.FwsApplication.Support, "uses", $techn="", $tags="", $link="")
 Rel(FwsApplication.FwsApplication.ProjectService, FwsApplication.FwsApplication.Core, "depends on", $techn="", $tags="", $link="")
 Rel(FwsApplication.FwsApplication.ProjectService, FwsApplication.FwsApplication.Support, "uses", $techn="", $tags="", $link="")
-Rel(FwsApplication.FwsApplication.Support, FwsApplication.FwsApplication.Core, "depends on", $techn="", $tags="", $link="")
-Rel(FwsApplication.FwsApplication.FreelancerService, FwsApplication.FwsApplication.ProjectService, "listens to", $techn="", $tags="", $link="")
 
 SHOW_LEGEND(true)
 @enduml
